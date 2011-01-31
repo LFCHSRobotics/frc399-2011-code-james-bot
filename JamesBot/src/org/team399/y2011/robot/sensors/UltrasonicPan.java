@@ -30,7 +30,7 @@ public class UltrasonicPan {
     }
 
     /**
-     * Set the angle ofthe servo
+     * Set the angle of the servo
      * @param angle The angle
      */
     public void setAngle(double angle) {
