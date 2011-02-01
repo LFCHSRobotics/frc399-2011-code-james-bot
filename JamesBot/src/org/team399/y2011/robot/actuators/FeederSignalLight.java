@@ -23,7 +23,6 @@ public class FeederSignalLight {
         red = new Relay(redPort);
         white = new Relay(whitePort);
         blue = new Relay(bluePort);
-        
     }
     
     /**
