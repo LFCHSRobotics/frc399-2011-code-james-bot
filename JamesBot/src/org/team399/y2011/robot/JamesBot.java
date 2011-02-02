@@ -38,7 +38,7 @@ public class JamesBot extends IterativeRobot {
     
     public void teleopPeriodic() {
         robot.tankDrive(leftJoy.getY(),
-                        rightJoy.getY());
+                        rightJoy.getY());   //Tank drive
     }
 
     /**

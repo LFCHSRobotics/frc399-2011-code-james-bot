@@ -18,7 +18,7 @@ public class Rumblepad2GamePad {
      * @param port The USB port the gamepad is connected to
      */
     public Rumblepad2GamePad(int port) {
-        m_Pad = new Joystick(port);
+        m_Pad = new Joystick(port);     //Instantiate the gamepad on port 1
     }
 
     /**
@@ -26,7 +26,7 @@ public class Rumblepad2GamePad {
      * @return the Y axis
      */
     public double getLeftY() {
-        return m_Pad.getRawAxis(2);
+        return m_Pad.getRawAxis(2); //Return the left Y axis value
     }
 
     /**
@@ -34,14 +34,14 @@ public class Rumblepad2GamePad {
      * @return the X axis
      */
     public double getLeftX() {
-        return m_Pad.getRawAxis(1);
+        return m_Pad.getRawAxis(1); //Return the left X axis value
     }
     /**
      * Get the left Y axis
      * @return the Y axis
      */
     public double getRightY() {
-        return m_Pad.getRawAxis(2);
+        return m_Pad.getRawAxis(2); //Return the right Y axis value
     }
 
     /**
@@ -49,7 +49,7 @@ public class Rumblepad2GamePad {
      * @return the X axis
      */
     public double getRightX() {
-        return m_Pad.getRawAxis(1);
+        return m_Pad.getRawAxis(1); //Return the right X axis value
     }
 
     /**
@@ -58,6 +58,6 @@ public class Rumblepad2GamePad {
      * @return the state of the button
      */
     public boolean getButton(int button) {
-        return m_Pad.getRawButton(button);
+        return m_Pad.getRawButton(button);  //Return the state of the desired button
     }
 }
