@@ -107,16 +107,16 @@ public class DriveTrain {
     public double getSingleMotorCurrent(int motor) {
         switch(motor) {
             case kMotors.kLeftA:
-                try { return leftA.getOutputCurrent(); }
+                try { return leftA.getOutputCurrent(); }    //Return the current from motor leftA
                 catch(Exception e) { e.printStackTrace(); return 0.0; }
             case kMotors.kLeftB:
-                try { return leftB.getOutputCurrent(); }
+                try { return leftB.getOutputCurrent(); }    //return the current from motor leftB
                 catch(Exception e) { e.printStackTrace(); return 0.0; }
             case kMotors.kRightA:
-                try { return rightA.getOutputCurrent(); }
+                try { return rightA.getOutputCurrent(); }   //Return the current from motor rightA
                 catch(Exception e) { e.printStackTrace(); return 0.0; }
             case kMotors.kRightB:
-                try { return rightB.getOutputCurrent(); }
+                try { return rightB.getOutputCurrent(); }   //Return the current from motor rightB
                 catch(Exception e) { e.printStackTrace(); return 0.0; }
             default: return 0.0;
         }
@@ -129,10 +129,10 @@ public class DriveTrain {
      */
     public double getSideCurrent(int side) {
         switch(side) {
-            case kSides.kLeft:
+            case kSides.kLeft:  //Return current from the left side motors
                 try { return ((leftA.getOutputCurrent() + leftB.getOutputCurrent())/2); }
                 catch(Exception e) { e.printStackTrace(); return 0.0; }
-            case kSides.kRight:
+            case kSides.kRight: //Return the current from the right side motors
                 try { return ((rightA.getOutputCurrent() + rightB.getOutputCurrent())/2); }
                 catch(Exception e) { e.printStackTrace(); return 0.0; }
             default: return 0.0;
@@ -145,6 +145,7 @@ public class DriveTrain {
      */
     public double getAverageCurrent() {
         try {
+            //Return the average current for the entire drivetrain
             return ((leftA.getOutputCurrent() + leftB.getOutputCurrent() +
                      rightA.getOutputCurrent() + rightB.getOutputCurrent())/4);
         } catch(Exception e) {

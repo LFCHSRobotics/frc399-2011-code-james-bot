@@ -8,17 +8,18 @@ package org.team399.y2011.robot.actuators;
 import edu.wpi.first.wpilibj.CANJaguar;
 
 /**
- *
+ * Arm class
  * @author Jeremy Germita
  */
 public class Arm {
-    private CANJaguar armA;
-    private CANJaguar armB;
+    private CANJaguar armA; //Instance of arm CAN Jaguar, A
+    private CANJaguar armB; //Instance of arm CAN Jaguar, B
     
     public Arm() {
         try {
-            armA = new CANJaguar(6);
-            armB = new CANJaguar(7);
+            armA = new CANJaguar(6);    //armA is a CANJaguar with the address 6
+            armB = new CANJaguar(7);    //armB is a CANJaguar with the address 7
+            //Set the position reference for this jaguar to a pot
             armA.setPositionReference(CANJaguar.PositionReference.kPotentiometer);
         } catch(Exception e) {
             e.printStackTrace();
@@ -27,28 +28,27 @@ public class Arm {
     
     public void set(double value) {
         try {
-            armA.setX(value);
-            armB.setX(-value);
-            
+            armA.setX(value);   //Set armA to the argument, value
+            armB.setX(-value);  //Set armB to the argument, value, times -1
         } catch(Exception e) {
             e.printStackTrace();
         }
     }
 
-    private double processValue;
-    private double P = 0, I = 0, D = 0;
-    private double error, prevError, output, integral, derivative;
+    private double processValue;    //The potentiometer input
+    private final double P = 0, I = 0, D = 0; //P, I, and D values
+    private double error, prevError, output, integral, derivative; //Other values needed by PID
 
     public void setpoint(double point) {    
         try {
-            processValue = armA.getPosition();
-            error        = point - processValue;
-            integral     = prevError + error;
-            derivative   = prevError - error;
-            output       = (P*error) +
+            processValue = armA.getPosition();      //processValue is assigned the value of the pot
+            error        = point - processValue;    //error is the distance between the setpoint and process value
+            integral     = prevError + error;       //integral is the sum of the current and previous errors
+            derivative   = prevError - error;       //derivative is the rate of change between the current and prevErrors
+            output       = (P*error) +              //Calculate PID output
                            (I*integral) +
                            (D*derivative);
-            prevError    = error;
+            prevError    = error;                   //prevError is now equal to error
         } catch(Exception e) {
             e.printStackTrace();
         }

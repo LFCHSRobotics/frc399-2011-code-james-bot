@@ -14,9 +14,8 @@ import edu.wpi.first.wpilibj.Ultrasonic;
  */
 public class UltrasonicPan {
 
-    private Servo m_Servo;
-    private Ultrasonic m_Us;
-
+    private Servo m_Servo;  //The servo
+    private Ultrasonic m_Us;//The ultrasonic sensor
 
     /**
      * Constructor
@@ -25,8 +24,8 @@ public class UltrasonicPan {
      * @param servo The servo PWM port
      */
     public UltrasonicPan(int ping, int echo, int servo) {
-        this.m_Servo = new Servo(servo);
-        this.m_Us = new Ultrasonic(ping, echo);
+        this.m_Servo = new Servo(servo);        //Servo is a new servo on specified port
+        this.m_Us = new Ultrasonic(ping, echo); //Instantiate the sensor on these ports
     }
 
     /**
@@ -34,7 +33,7 @@ public class UltrasonicPan {
      * @param angle The angle
      */
     public void setAngle(double angle) {
-        this.m_Servo.setAngle(angle);
+        this.m_Servo.setAngle(angle);   //Set the servo angle
     }
 
     /**
@@ -45,10 +44,10 @@ public class UltrasonicPan {
      */
     public void pan(double leftLimit, double rightLimit, double resolution) {
         for(double i = leftLimit; i < rightLimit; i += resolution) {
-            setAngle(i);
+            setAngle(i);    //Pan clockwise
         }
         for(double i = rightLimit; i < leftLimit; i -= resolution) {
-            setAngle(i);
+            setAngle(i);    //Pan counterclockwise
         }
     }
 
@@ -57,6 +56,6 @@ public class UltrasonicPan {
      * @return The range in inches
      */
     public double getRange() {
-        return this.m_Us.getRangeInches();
+        return this.m_Us.getRangeInches();  //Get the range of the sensor
     }
 }

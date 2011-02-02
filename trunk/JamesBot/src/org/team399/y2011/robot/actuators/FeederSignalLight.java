@@ -20,9 +20,9 @@ public class FeederSignalLight {
      * @param bluePort Relay port for Blue Light
      */
     public FeederSignalLight(int redPort, int whitePort, int bluePort) {
-        red = new Relay(redPort);
-        white = new Relay(whitePort);
-        blue = new Relay(bluePort);
+        red   = new Relay(redPort);     //Instantiate the red relay on redPort
+        white = new Relay(whitePort);   //Instantiate the white relay on whitePort
+        blue  = new Relay(bluePort);    //Instantiate the blue relay on bluePort
     }
     
     /**
@@ -30,17 +30,19 @@ public class FeederSignalLight {
      * @param state True = on, False = false
      */
     public void setRed(boolean state) {
+        //The relay value to set
         Relay.Value setV = ((state) ? Relay.Value.kForward : Relay.Value.kForward);
-        red.set(setV);
+        red.set(setV);  //Set the relay to the value
     }
     
     /**
-     * Set the blue light
+     * Set the white light
      * @param state True = on, False = false
      */
     public void setWhite(boolean state) {
+        //Relay value to be set
         Relay.Value setV = ((state) ? Relay.Value.kForward : Relay.Value.kForward);
-        white.set(setV);
+        white.set(setV);    //Set the relay to the value
     }
     
     /**
@@ -48,8 +50,9 @@ public class FeederSignalLight {
      * @param state True = on, False = false
      */
     public void setBlue(boolean state) {
+        //The relay value to be set
         Relay.Value setV = ((state) ? Relay.Value.kForward : Relay.Value.kForward);
-        blue.set(setV);
+        blue.set(setV); //Set the relay to the value
     }
     
     /**
@@ -67,47 +70,47 @@ public class FeederSignalLight {
     public void setAll(int allState) {
         switch(allState) {
             case 0x00:
-                setRed(false);
-                setWhite(false);
-                setBlue(false);
+                setRed(false);      //Red off
+                setWhite(false);    //White off
+                setBlue(false);     //Blue off
                 break;
             case 0x01:
-                setRed(true);
-                setWhite(false);
-                setBlue(false);
+                setRed(true);       //Red on
+                setWhite(false);    //White off
+                setBlue(false);     //Blue off
                 break;
             case 0x02:
-                setRed(false);
-                setWhite(true);
-                setBlue(false);
+                setRed(false);      //Red off
+                setWhite(true);     //White on
+                setBlue(false);     //Blue off
                 break;
             case 0x03:
-                setRed(false);
-                setWhite(false);
-                setBlue(true);
+                setRed(false);      //Red off
+                setWhite(false);    //White off
+                setBlue(true);      //Blue off
                 break;
             case 0x04:
-                setRed(true);
-                setWhite(true);
-                setBlue(false);
+                setRed(true);       //Red on
+                setWhite(true);     //White on
+                setBlue(false);     //Blue off
                 break;
             case 0x05:
-                setRed(true);
-                setWhite(false);
-                setBlue(true);
+                setRed(true);       //Red on
+                setWhite(false);    //White off
+                setBlue(true);      //Blue on
                 break;
             case 0x06:
-                setRed(false);
-                setWhite(true);
-                setBlue(true);
+                setRed(false);      //Red off
+                setWhite(true);     //White on
+                setBlue(true);      //Blue on
                 break;
             case 0x07:
-                setRed(true);
+                setRed(true);       //All on
                 setWhite(true);
                 setBlue(true);
                 break;
             default:
-                setRed(false);
+                setRed(false);      //All off
                 setWhite(false);
                 setBlue(false);
                 break;
