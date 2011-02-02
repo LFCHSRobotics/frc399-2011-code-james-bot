@@ -44,7 +44,7 @@ public class Arm {
             processValue = armA.getPosition();      //processValue is assigned the value of the pot
             error        = point - processValue;    //error is the distance between the setpoint and process value
             integral     = prevError + error;       //integral is the sum of the current and previous errors
-            derivative   = prevError - error;       //derivative is the rate of change between the current and prevErrors
+            derivative   = error-prevError;         //derivative is the rate of change between the current and prevErrors
             output       = (P*error) +              //Calculate PID output
                            (I*integral) +
                            (D*derivative);
