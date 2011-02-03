@@ -11,7 +11,7 @@ import org.team399.y2011.robot.utilities.Math;
 
 /**
  *  DriveTrain Class. A wrapper class for CANJaguars.
- * @author Jeremy Germita
+ * @author Jeremy Germita and Gabe Ruiz
  */
 public class DriveTrain {
     private CANJaguar leftA;    //Left motor A
