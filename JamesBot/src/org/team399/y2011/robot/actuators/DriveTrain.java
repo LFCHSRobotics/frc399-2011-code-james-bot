@@ -32,6 +32,7 @@ public class DriveTrain {
             rightB = new CANJaguar(5);    //Right Motor B
         } catch(Exception e){
             e.printStackTrace();
+            System.out.println("ERROR INITIALIZING DRIVETRAIN");
         }
     }
 

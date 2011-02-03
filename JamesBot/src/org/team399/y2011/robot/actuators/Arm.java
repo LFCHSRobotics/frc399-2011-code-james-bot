@@ -23,9 +23,10 @@ public class Arm {
             armA.setPositionReference(CANJaguar.PositionReference.kPotentiometer);
         } catch(Exception e) {
             e.printStackTrace();
+            System.out.print("ERROR INITIALIZING ARM");
         }
     }
-    
+
     public void set(double value) {
         try {
             armA.setX(value);   //Set armA to the argument, value
@@ -39,7 +40,7 @@ public class Arm {
     private final double P = 0, I = 0, D = 0; //P, I, and D values
     private double error, prevError, output, integral, derivative; //Other values needed by PID
 
-    public void setpoint(double point) {    
+    public void setpoint(double point) {
         try {
             processValue = armA.getPosition();      //processValue is assigned the value of the pot
             error        = point - processValue;    //error is the distance between the setpoint and process value
