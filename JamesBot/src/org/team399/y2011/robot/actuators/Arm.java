@@ -12,6 +12,10 @@ import edu.wpi.first.wpilibj.CANJaguar;
  * @author Jeremy Germita
  */
 public class Arm {
+
+    //TODO:
+    //IMPLEMENT JUSTIN'S CHANGES.
+    //
     private CANJaguar armA; //Instance of arm CAN Jaguar, A
     private CANJaguar armB; //Instance of arm CAN Jaguar, B
     
