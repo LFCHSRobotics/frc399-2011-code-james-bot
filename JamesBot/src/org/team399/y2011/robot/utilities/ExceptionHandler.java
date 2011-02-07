@@ -7,8 +7,15 @@ package org.team399.y2011.robot.utilities;
 
 /**
  *
- * @author kspoelstra
+ * @author Jeremy Germita
  */
 public class ExceptionHandler {
+    private Exception m_excep;
+    public ExceptionHandler(Exception e, String subSysName) {
+        m_excep = e;
+    }
 
+    public void print() {
+        m_excep.printStackTrace();
+    }
 }

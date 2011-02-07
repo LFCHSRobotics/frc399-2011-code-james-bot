@@ -26,10 +26,14 @@ public class DriveTrain {
      */
     public DriveTrain() {
         try {
-            leftA  = new CANJaguar(2);    //Left motor A
-            leftB  = new CANJaguar(3);    //Left motor B
-            rightA = new CANJaguar(4);    //Right motor A
+            leftA  = new CANJaguar(6);    //Left motor A
+            leftB  = new CANJaguar(8);    //Left motor B
+            rightA = new CANJaguar(2);    //Right motor A
             rightB = new CANJaguar(5);    //Right Motor B
+            leftA.configFaultTime(.5);
+            leftB.configFaultTime(.5);
+            rightA.configFaultTime(.5);
+            rightB.configFaultTime(.5);
         } catch(Exception e){
             e.printStackTrace();
             System.out.println("ERROR INITIALIZING DRIVETRAIN");
@@ -43,18 +47,11 @@ public class DriveTrain {
      */
     public void tankDrive(double leftV, double rightV) {
         try {
-            leftA  = new CANJaguar(2);    //Left motor A
-            leftB  = new CANJaguar(3);    //Left motor B
-            rightA = new CANJaguar(4);    //Right motor A
-            rightB = new CANJaguar(5);    //Right Motor B
-        } catch(Exception e){
-            e.printStackTrace();
-        }
-        try {
-            leftA.setX(leftV);       //Set left motor A
-            leftB.setX(leftV);       //Set left motor B
-            rightA.setX(rightV);     //Set right motor A
-            rightB.setX(rightV);     //Set right motor B
+            leftA.setX(leftV,(byte) 1);       //Set left motor A
+            leftB.setX(leftV,(byte) 1);       //Set left motor B
+            rightA.setX(rightV,(byte) 1);     //Set right motor A
+            rightB.setX(rightV,(byte) 1);     //Set right motor B
+            CANJaguar.updateSyncGroup((byte) 1);
         } catch(Exception e) {
             e.printStackTrace();
         }
@@ -66,14 +63,7 @@ public class DriveTrain {
      * @param turn
      */
     public void arcadeDrive(double throttle, double turn) {
-        try {
-            leftA  = new CANJaguar(2);    //Left motor A
-            leftB  = new CANJaguar(3);    //Left motor B
-            rightA = new CANJaguar(4);    //Right motor A
-            rightB = new CANJaguar(5);    //Right Motor B
-        } catch(Exception e){
-            e.printStackTrace();
-        }
+        
         try {
             leftA.setX(throttle + turn);     //Set left motor A
             leftB.setX(throttle + turn);     //Set left motor B

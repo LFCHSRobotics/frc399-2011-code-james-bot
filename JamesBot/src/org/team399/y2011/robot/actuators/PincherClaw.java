@@ -4,23 +4,51 @@
  */
 
 package org.team399.y2011.robot.actuators;
-import edu.wpi.first.wpilibj.Solenoid;
+import edu.wpi.first.wpilibj.DoubleSolenoid;
 /**
  *
  * @author Jeremy Germita, Jackie Patton
  */
 public class PincherClaw {
     
-    private Solenoid ClawA = new Solenoid(1);   //Solenoid on port 1
-    private Solenoid ClawB = new Solenoid(2);   //Solenoid on port 2
+    private DoubleSolenoid claw;   //Double solenoid for pincher claw
 
-    public PincherClaw() {
+    /**
+     * Constructor
+     * @param portA Port a of the solenoid
+     * @param portB Port b of the solenoid
+     */
+    public PincherClaw(int portA, int portB) {
+        claw = new DoubleSolenoid(8, portA, portB);
+    }
+    private boolean prevState, set;
+    /**
+     *
+     * @param state
+     */
+    public void grab(boolean state) {
+        set = state;
+        if(set && set != prevState) {
 
+            DoubleSolenoid.Value setValue = (set) ? DoubleSolenoid.Value.kForward
+                    : DoubleSolenoid.Value.kReverse;    //The value to set the pincher claw
+            claw.set(setValue);               //Sets the pincher claw to value
+        }
+        prevState = set;
     }
 
-    public void grab(boolean state) {
-        ClawA.set(state);               //sets to boolean state
-        ClawB.set(!state);              //sets opposite boolean state
+    /**
+     *
+     */
+    public static class states {
+        /**
+         * The closed state
+         */
+        boolean closed = false;
+        /**
+         * The opened state
+         */
+        boolean opened = true;
     }
 
 }
