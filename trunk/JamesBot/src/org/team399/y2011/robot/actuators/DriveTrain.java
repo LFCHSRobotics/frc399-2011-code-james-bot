@@ -63,15 +63,23 @@ public class DriveTrain {
      * @param turn
      */
     public void arcadeDrive(double throttle, double turn) {
-        
         try {
-            leftA.setX(throttle + turn);     //Set left motor A
-            leftB.setX(throttle + turn);     //Set left motor B
-            rightA.setX(throttle - turn);    //Set right motor A
-            rightB.setX(throttle - turn);    //Set right motor B
+            leftA.setX(throttle + turn, (byte) 1);     //Set left motor A
+            leftB.setX(throttle + turn, (byte) 1);     //Set left motor B
+            rightA.setX(throttle - turn, (byte) 1);    //Set right motor A
+            rightB.setX(throttle - turn, (byte) 1);    //Set right motor B
+            CANJaguar.updateSyncGroup((byte) 1);
         } catch(Exception e) {
             e.printStackTrace();
         }
+    }
+
+    /**
+     * Set the gyro for use with various drivetrain actions
+     * @param gyro
+     */
+    public void setGyro(Gyro gyro) {
+        this.yaw = gyro;
     }
 
     /**
@@ -80,15 +88,27 @@ public class DriveTrain {
      * @param throttle The speed to run the motors
      * @param angle The angle to drive to
      */
-    public void angleDrive(Gyro gyro, double throttle, double angle) {
-        this.yaw = gyro;
-        double p, i, d;
+    public void angleDrive(double throttle, double angle) {
+        
+        double p = 0, i = 0, d = 0;
         double error, prevError;
         double thresh = 10;
 
         if(Math.threshold(yaw.getAngle(), (angle+thresh), (angle-thresh))) {
-
+            error = yaw.getAngle();
+            arcadeDrive(throttle, ((p*error)));
+        } else {
+            arcadeDrive(throttle, 0);
         }
+    }
+
+    /**
+     * Hold the current position. Will use gyro and encoder to hold the current
+     * position.
+     * @param hold Whether or not to hold
+     */
+    public void holdPosition(boolean hold) {
+
     }
     /**
      * Get Current at a single motor
