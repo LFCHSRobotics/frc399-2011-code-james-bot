@@ -5,18 +5,31 @@
 
 package org.team399.y2011.robot.actuators;
 
-import edu.wpi.first.wpilibj.Solenoid;
+import edu.wpi.first.wpilibj.DoubleSolenoid;
+
 /**
- *
+ * Deployment mechanism class
  * @author Jeremy Germita and Jackie Patton
  */
 public class DeploymentMechanism {
 
-    private Solenoid DeployA = new Solenoid(3);     //Solenoid on port 3
-    private Solenoid DeployB = new Solenoid(4);     //Solenoid on port 4
+    private DoubleSolenoid deployActuator;  //The actuator
 
+    /**
+     * Constructor
+     * @param a actuator port A
+     * @param actuator port b
+     */
+    public DeploymentMechanism(int a, int b) {
+        deployActuator = new DoubleSolenoid(a, b);  //Instantiates the Double solenoid
+    }
+
+    /**
+     * DEPLOY THE MINIBOT!
+     * @param state the boolean input used to deploy
+     */
     public void deploy (boolean state){
-    DeployA.set(state);                 //sets to boolean state
-    DeployB.set(!state);                //sets to opposite boolean state
+        deployActuator.set(((state) ? DoubleSolenoid.Value.kForward :
+            DoubleSolenoid.Value.kReverse));    //sets the solenoid
     }
 }

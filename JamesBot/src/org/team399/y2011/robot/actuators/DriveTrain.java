@@ -6,6 +6,8 @@
 package org.team399.y2011.robot.actuators;
 import edu.wpi.first.wpilibj.CANJaguar;
 import edu.wpi.first.wpilibj.Gyro;
+import org.team399.y2011.robot.utilities.ExceptionHandler;
+
 import org.team399.y2011.robot.utilities.Math;
 //import java.lang.Math;
 
@@ -35,7 +37,7 @@ public class DriveTrain {
             rightA.configFaultTime(.5);
             rightB.configFaultTime(.5);
         } catch(Exception e){
-            e.printStackTrace();
+            new ExceptionHandler(e, "DriveTrain").print();
             System.out.println("ERROR INITIALIZING DRIVETRAIN");
         }
     }
@@ -53,7 +55,7 @@ public class DriveTrain {
             rightB.setX(rightV,(byte) 1);     //Set right motor B
             CANJaguar.updateSyncGroup((byte) 1);
         } catch(Exception e) {
-            e.printStackTrace();
+            new ExceptionHandler(e, "DriveTrain").print();
         }
     }
     
@@ -64,13 +66,9 @@ public class DriveTrain {
      */
     public void arcadeDrive(double throttle, double turn) {
         try {
-            leftA.setX(throttle + turn, (byte) 1);     //Set left motor A
-            leftB.setX(throttle + turn, (byte) 1);     //Set left motor B
-            rightA.setX(throttle - turn, (byte) 1);    //Set right motor A
-            rightB.setX(throttle - turn, (byte) 1);    //Set right motor B
-            CANJaguar.updateSyncGroup((byte) 1);
+            tankDrive(throttle + turn, throttle - turn);
         } catch(Exception e) {
-            e.printStackTrace();
+            new ExceptionHandler(e, "DriveTrain").print();
         }
     }
 
@@ -119,16 +117,16 @@ public class DriveTrain {
         switch(motor) {
             case kMotors.kLeftA:
                 try { return leftA.getOutputCurrent(); }    //Return the current from motor leftA
-                catch(Exception e) { e.printStackTrace(); return 0.0; }
+                catch(Exception e) { new ExceptionHandler(e, "DriveTrain").print(); return 0.0; }
             case kMotors.kLeftB:
                 try { return leftB.getOutputCurrent(); }    //return the current from motor leftB
-                catch(Exception e) { e.printStackTrace(); return 0.0; }
+                catch(Exception e) { new ExceptionHandler(e, "DriveTrain").print(); return 0.0; }
             case kMotors.kRightA:
                 try { return rightA.getOutputCurrent(); }   //Return the current from motor rightA
-                catch(Exception e) { e.printStackTrace(); return 0.0; }
+                catch(Exception e) { new ExceptionHandler(e, "DriveTrain").print(); return 0.0; }
             case kMotors.kRightB:
                 try { return rightB.getOutputCurrent(); }   //Return the current from motor rightB
-                catch(Exception e) { e.printStackTrace(); return 0.0; }
+                catch(Exception e) { new ExceptionHandler(e, "DriveTrain").print(); return 0.0; }
             default: return 0.0;
         }
     }
@@ -142,10 +140,10 @@ public class DriveTrain {
         switch(side) {
             case kSides.kLeft:  //Return current from the left side motors
                 try { return ((leftA.getOutputCurrent() + leftB.getOutputCurrent())/2); }
-                catch(Exception e) { e.printStackTrace(); return 0.0; }
+                catch(Exception e) { new ExceptionHandler(e, "DriveTrain").print(); return 0.0; }
             case kSides.kRight: //Return the current from the right side motors
                 try { return ((rightA.getOutputCurrent() + rightB.getOutputCurrent())/2); }
-                catch(Exception e) { e.printStackTrace(); return 0.0; }
+                catch(Exception e) { new ExceptionHandler(e, "DriveTrain").print(); return 0.0; }
             default: return 0.0;
         }
     }
@@ -160,7 +158,7 @@ public class DriveTrain {
             return ((leftA.getOutputCurrent() + leftB.getOutputCurrent() +
                      rightA.getOutputCurrent() + rightB.getOutputCurrent())/4);
         } catch(Exception e) {
-            e.printStackTrace();
+            new ExceptionHandler(e, "DriveTrain").print();
             return 0.0;
         }
     }
