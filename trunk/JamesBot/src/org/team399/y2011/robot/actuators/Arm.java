@@ -6,6 +6,7 @@
 package org.team399.y2011.robot.actuators;
 
 import edu.wpi.first.wpilibj.CANJaguar;
+import org.team399.y2011.robot.utilities.ExceptionHandler;
 
 /**
  * Arm class
@@ -28,8 +29,8 @@ public class Arm {
             //Set the position reference for this jaguar to a pot
             armA.setPositionReference(CANJaguar.PositionReference.kPotentiometer);
         } catch(Exception e) {
-            e.printStackTrace();
             System.out.print("ERROR INITIALIZING ARM");
+            new ExceptionHandler(e, "Arm").print();
         }
     }
 
@@ -39,7 +40,7 @@ public class Arm {
             armB.setX(-value, (byte) 2);  //Set armB to the argument, value, times -1
             CANJaguar.updateSyncGroup((byte) 2);
         } catch(Exception e) {
-            e.printStackTrace();
+            new ExceptionHandler(e, "Arm").print();
         }
     }
 
@@ -58,7 +59,7 @@ public class Arm {
                            (D*derivative);
             prevError    = error;                   //prevError is now equal to error
         } catch(Exception e) {
-            e.printStackTrace();
+            new ExceptionHandler(e, "Arm").print();
         }
     }
 }
