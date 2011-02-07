@@ -26,7 +26,7 @@ public class JamesBot extends IterativeRobot {
     
     Attack3Joystick leftJoy  = new Attack3Joystick(1);    //Left Joystick
     Attack3Joystick rightJoy = new Attack3Joystick(2);    //Right Joystick
-    Rumblepad2GamePad operator = new Rumblepad2GamePad(3);    //Operator gamepad
+    Rumblepad2GamePad operator = new Rumblepad2GamePad(3);//Operator gamepad
 
     /**
      * This function is run when the robot is first started up and should be
@@ -38,7 +38,7 @@ public class JamesBot extends IterativeRobot {
     
     public void teleopPeriodic() {
         robot.tankDrive(leftJoy.getY(),
-                        rightJoy.getY());   //Tank drive
+                        rightJoy.getY());   //Tank drive, two sticks
 
     }
 
