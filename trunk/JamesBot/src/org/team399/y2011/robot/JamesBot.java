@@ -12,6 +12,7 @@ import org.team399.y2011.robot.actuators.DriveTrain;
 import edu.wpi.first.wpilibj.IterativeRobot;
 import edu.wpi.first.wpilibj.Joystick;
 import org.team399.y2011.HumanInterfaceDevices.Attack3Joystick;
+import org.team399.y2011.robot.actuators.Arm;
 
 /**
  * The VM is configured to automatically run this class, and to call the
@@ -23,6 +24,7 @@ import org.team399.y2011.HumanInterfaceDevices.Attack3Joystick;
 public class JamesBot extends IterativeRobot {
 
     DriveTrain robot = new DriveTrain();   //DriveTrain instance, contains drive code
+    Arm arm = new Arm();
     
     Attack3Joystick leftJoy  = new Attack3Joystick(1);    //Left Joystick
     Attack3Joystick rightJoy = new Attack3Joystick(2);    //Right Joystick
@@ -38,7 +40,8 @@ public class JamesBot extends IterativeRobot {
     
     public void teleopPeriodic() {
         robot.tankDrive(leftJoy.getY(),
-                        rightJoy.getY());   //Tank drive
+                        -rightJoy.getY());   //Tank drive
+        arm.set(operator.getRawAxis(4)*(((leftJoy.getThrottle()+1)/2)));
     }
 
     /**

@@ -21,8 +21,10 @@ public class Arm {
     
     public Arm() {
         try {
-            armA = new CANJaguar(6);    //armA is a CANJaguar with the address 6
+            armA = new CANJaguar(4);    //armA is a CANJaguar with the address 6
             armB = new CANJaguar(7);    //armB is a CANJaguar with the address 7
+            armA.configNeutralMode(CANJaguar.NeutralMode.kBrake);
+            armA.configNeutralMode(CANJaguar.NeutralMode.kBrake);
             //Set the position reference for this jaguar to a pot
             armA.setPositionReference(CANJaguar.PositionReference.kPotentiometer);
         } catch(Exception e) {
@@ -33,8 +35,9 @@ public class Arm {
 
     public void set(double value) {
         try {
-            armA.setX(value);   //Set armA to the argument, value
-            armB.setX(-value);  //Set armB to the argument, value, times -1
+            armA.setX(value, (byte) 2);   //Set armA to the argument, value
+            armB.setX(-value, (byte) 2);  //Set armB to the argument, value, times -1
+            CANJaguar.updateSyncGroup((byte) 2);
         } catch(Exception e) {
             e.printStackTrace();
         }
