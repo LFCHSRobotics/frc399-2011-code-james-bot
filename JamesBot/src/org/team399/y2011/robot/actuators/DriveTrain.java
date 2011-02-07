@@ -88,13 +88,20 @@ public class DriveTrain {
      */
     public void angleDrive(double throttle, double angle) {
         
-        double p = 0, i = 0, d = 0;
+        double p = 0, proportional,
+                i = 0, d = 0;
         double error, prevError;
         double thresh = 10;
 
         if(Math.threshold(yaw.getAngle(), (angle+thresh), (angle-thresh))) {
             error = yaw.getAngle();
-            arcadeDrive(throttle, ((p*error)));
+            proportional = (p*error);
+            if(proportional > 1) {
+                proportional = 1;
+            } else if(proportional < -1){
+                proportional = -1;
+            }
+            arcadeDrive(throttle, (proportional));
         } else {
             arcadeDrive(throttle, 0);
         }
