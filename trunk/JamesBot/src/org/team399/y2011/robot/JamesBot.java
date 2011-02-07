@@ -10,8 +10,8 @@ package org.team399.y2011.robot;
 
 import org.team399.y2011.robot.actuators.DriveTrain;
 import edu.wpi.first.wpilibj.IterativeRobot;
-import edu.wpi.first.wpilibj.Joystick;
 import org.team399.y2011.HumanInterfaceDevices.Attack3Joystick;
+import org.team399.y2011.HumanInterfaceDevices.Rumblepad2GamePad;
 
 /**
  * The VM is configured to automatically run this class, and to call the
@@ -26,7 +26,7 @@ public class JamesBot extends IterativeRobot {
     
     Attack3Joystick leftJoy  = new Attack3Joystick(1);    //Left Joystick
     Attack3Joystick rightJoy = new Attack3Joystick(2);    //Right Joystick
-    Joystick operator = new Joystick(3);    //Operator gamepad
+    Rumblepad2GamePad operator = new Rumblepad2GamePad(3);    //Operator gamepad
 
     /**
      * This function is run when the robot is first started up and should be
@@ -39,6 +39,7 @@ public class JamesBot extends IterativeRobot {
     public void teleopPeriodic() {
         robot.tankDrive(leftJoy.getY(),
                         rightJoy.getY());   //Tank drive
+
     }
 
     /**
