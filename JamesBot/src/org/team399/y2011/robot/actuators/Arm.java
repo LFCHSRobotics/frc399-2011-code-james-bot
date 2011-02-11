@@ -135,6 +135,9 @@ public class Arm {
         enabled = true;
     }
 
+    /**
+     * Disable pid control
+     */
     public void disable() {
         enabled = false;
     }
