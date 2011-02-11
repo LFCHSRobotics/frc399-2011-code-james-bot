@@ -92,10 +92,10 @@ public class Arm {
         if(enabled) {
             try {
                 processValue = pot.getAverageVoltage();      //processValue is assigned the value of the pot
-                error        = setpoint - processValue;    //error is the distance between the setpoint and process value
-                integral     = prevError + error;       //integral is the sum of the current and previous errors
-                derivative   = error-prevError;         //derivative is the rate of change between the current and prevErrors
-                output       = (P*error) +              //Calculate PID output
+                error        = setpoint - processValue;      //error is the distance between the setpoint and process value
+                integral     += error;                       //integral is the sum of the current and previous errors
+                derivative   = error-prevError;              //derivative is the rate of change between the current and prevErrors
+                output       = (P*error) +                   //Calculate PID output
                                (I*integral) -
                                (D*derivative);
                 if(output > 1.0) {
@@ -140,6 +140,9 @@ public class Arm {
      */
     public void disable() {
         enabled = false;
+        integral = 0.0;
+        enabled = false;
+        set(0.0);
     }
 
 }
