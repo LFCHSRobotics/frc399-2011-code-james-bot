@@ -77,7 +77,7 @@ public class Arm {
      * Print the potentiometer value
      */
     public void print() {
-        System.out.println(pot.getAverageVoltage());
+        System.out.println("Potentiometer Value: " + pot.getAverageVoltage());
     }
 
     private double processValue;    //The potentiometer input
@@ -103,7 +103,7 @@ public class Arm {
                 } else if(output < -1.0){
                     output = -1.0;
                 }
-                System.out.println("O/P" + output);
+                System.out.println("O/P: " + output);
                 set(-output);
                 prevError = error;                   //prevError is now equal to error
             } catch(Throwable e) {
@@ -131,7 +131,6 @@ public class Arm {
      * Enable PID Control for the arm
      */
     public void enable() {
-        //TODO: Implement integral zeroing
         enabled = true;
     }
 
@@ -143,6 +142,14 @@ public class Arm {
         integral = 0.0;
         enabled = false;
         set(0.0);
+    }
+
+    /**
+     * return the setpoint
+     * @return the setpoint
+     */
+    public double getSetpoint() {
+        return setpoint;
     }
 
 }
