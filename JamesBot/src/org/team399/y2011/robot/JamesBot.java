@@ -31,8 +31,8 @@ public class JamesBot extends IterativeRobot {
     Attack3Joystick rightJoy = new Attack3Joystick(2);    //Right Joystick
     Rumblepad2GamePad operator = new Rumblepad2GamePad(3);//Operator gamepad
 
-    Arm arm = new Arm();
-    Compressor compressor = new Compressor(14,1);
+    Arm arm               = new Arm();              //Arm instance
+    Compressor compressor = new Compressor(14,1);   //Compressor instance
     /**
      * This function is run when the robot is first started up and should be
      * used for any initialization code.
@@ -41,29 +41,28 @@ public class JamesBot extends IterativeRobot {
 
     }
 
+
+    public void disabledInit() {
+        arm.disable();  //Disable arm PID control
+    }
+
     public void teleopInit() {
-        compressor.start();
+        compressor.start(); //Start compressor
+        arm.enable();   //Enable arm PID
     }
 
     public void disabledPeriodic() {
-        arm.print();
+        arm.print();    //Print arm pot value
     }
 
     public void teleopPeriodic() {
         robot.tankDrive(rightJoy.getY(),
                         -leftJoy.getY());   //Tank drive, two sticks
-        arm.set(-operator.getRightY()*.3);
-        arm.print();
+        arm.print();    //Print pot value
         
-        if(operator.getButton(2)) {
-            arm.setpoint(2.12);
-        }
-        if(operator.getButton(1)){
-            arm.setpoint(2.5); 
-        }
-        if(operator.getButton(3)){
-            arm.setpoint(2.0);
-        }
+        arm.setPoint(arm.getSetpoint() +
+                -operator.getRightY()*.3); //Arm angle control, operator right stick
+        arm.update();   //Update arm pid
 
         if(operator.getButton(11)) {
             compressor.stop();
