@@ -14,30 +14,32 @@ import org.team399.y2011.robot.utilities.ExceptionHandler;
  * @author Jeremy Germita
  */
 public class Arm {
-
+    //TODO:  EDIT ArmState INTERFACE VALUES FOR PID SETPOINTS
+    /**
+     * Arm state interface
+     */
     public interface ArmStates {
         /**
         public static final double kOff_val = 0;
         public static final double kForward_val = 1;
         public static final double kReverse_val = 2;*/
     }
-    //TODO:
-    //IMPLEMENT JUSTIN'S CHANGES.
-    //
+    
     private CANJaguar armA; //Instance of arm CAN Jaguar, A
     private CANJaguar armB; //Instance of arm CAN Jaguar, B
 
-    private AnalogChannel pot;
-    
+    private AnalogChannel pot;  //Instance of the potentiometer
+
+    /**
+     * Constructor
+     */
     public Arm() {
+        pot = new AnalogChannel(1); //potentiometer
         try {
             armA = new CANJaguar(4);    //armA is a CANJaguar with the address 6
             armB = new CANJaguar(7);    //armB is a CANJaguar with the address 7
-            armA.configNeutralMode(CANJaguar.NeutralMode.kBrake);
+            armA.configNeutralMode(CANJaguar.NeutralMode.kBrake); //Brake the motors
             armB.configNeutralMode(CANJaguar.NeutralMode.kBrake);
-            pot = new AnalogChannel(1);
-            //Set the position reference for this jaguar to a pot
-            armA.setPositionReference(CANJaguar.PositionReference.kPotentiometer);
         } catch(Throwable e) {
             System.out.print("ERROR INITIALIZING ARM");
             new ExceptionHandler(e, "Arm").print();
@@ -46,6 +48,11 @@ public class Arm {
 
     private double upperLimit = 1.12;
     private double lowerLimit = 1.9;
+
+    /**
+     * Set the arm motors. Upper and lower limits are in place
+     * @param value The motor speed
+     */
     public void set(double value) {
         try {
             if(pot.getAverageVoltage() > upperLimit &&      //Upper and lower limit logic
@@ -66,6 +73,9 @@ public class Arm {
         }
     }
 
+    /**
+     * Print the potentiometer value
+     */
     public void print() {
         System.out.println(pot.getAverageVoltage());
     }
@@ -75,11 +85,14 @@ public class Arm {
     private double error, prevError, output, integral, derivative; //Other values needed by PID
     private boolean enabled = true;
 
-    public void setpoint(double point) {
+    /**
+     * Update pid
+     */
+    public void update() {
         if(enabled) {
             try {
                 processValue = pot.getAverageVoltage();      //processValue is assigned the value of the pot
-                error        = point - processValue;    //error is the distance between the setpoint and process value
+                error        = setpoint - processValue;    //error is the distance between the setpoint and process value
                 integral     = prevError + error;       //integral is the sum of the current and previous errors
                 derivative   = error-prevError;         //derivative is the rate of change between the current and prevErrors
                 output       = (P*error) +              //Calculate PID output
@@ -97,6 +110,33 @@ public class Arm {
                 new ExceptionHandler(e, "Arm").print();
             }
         }
+    }
+    
+    private double setpoint;
+    /**
+     * Set the point for the arm
+     * @param point the setpoint
+     */
+    public void setPoint(double point) {
+      if(point >= upperLimit) {
+        setpoint = upperLimit;
+      } else if(point <= lowerLimit) {
+        setpoint = lowerLimit;
+      } else {
+        setpoint = point;
+      }
+    }
+
+    /**
+     * Enable PID Control for the arm
+     */
+    public void enable() {
+        //TODO: Implement integral zeroing
+        enabled = true;
+    }
+
+    public void disable() {
+        enabled = false;
     }
 
 }
