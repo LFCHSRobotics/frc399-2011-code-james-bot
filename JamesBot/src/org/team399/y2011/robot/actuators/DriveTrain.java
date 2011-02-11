@@ -36,9 +36,17 @@ public class DriveTrain {
             leftB.configFaultTime(.5);
             rightA.configFaultTime(.5);
             rightB.configFaultTime(.5);
-        } catch(Exception e){
+        } catch(Throwable e){
             new ExceptionHandler(e, "DriveTrain").print();
             System.out.println("ERROR INITIALIZING DRIVETRAIN");
+            try {
+                leftA.enableControl();
+                leftB.enableControl();
+                rightA.enableControl();
+                rightB.enableControl();
+            } catch(Throwable t) {
+                t.printStackTrace();
+            }
         }
     }
 
@@ -54,8 +62,16 @@ public class DriveTrain {
             rightA.setX(rightV,(byte) 1);     //Set right motor A
             rightB.setX(rightV,(byte) 1);     //Set right motor B
             CANJaguar.updateSyncGroup((byte) 1);
-        } catch(Exception e) {
+        } catch(Throwable e) {
             new ExceptionHandler(e, "DriveTrain").print();
+            try {
+                leftA.enableControl();
+                leftB.enableControl();
+                rightA.enableControl();
+                rightB.enableControl();
+            } catch(Throwable t) {
+                t.printStackTrace();
+            }
         }
     }
     
@@ -67,8 +83,16 @@ public class DriveTrain {
     public void arcadeDrive(double throttle, double turn) {
         try {
             tankDrive(throttle + turn, throttle - turn);
-        } catch(Exception e) {
+        } catch(Throwable e) {
             new ExceptionHandler(e, "DriveTrain").print();
+            try {
+                leftA.enableControl();
+                leftB.enableControl();
+                rightA.enableControl();
+                rightB.enableControl();
+            } catch(Throwable t) {
+                t.printStackTrace();
+            }
         }
     }
 
@@ -124,16 +148,16 @@ public class DriveTrain {
         switch(motor) {
             case kMotors.kLeftA:
                 try { return leftA.getOutputCurrent(); }    //Return the current from motor leftA
-                catch(Exception e) { new ExceptionHandler(e, "DriveTrain").print(); return 0.0; }
+                catch(Throwable e) { new ExceptionHandler(e, "DriveTrain").print(); return 0.0; }
             case kMotors.kLeftB:
                 try { return leftB.getOutputCurrent(); }    //return the current from motor leftB
-                catch(Exception e) { new ExceptionHandler(e, "DriveTrain").print(); return 0.0; }
+                catch(Throwable e) { new ExceptionHandler(e, "DriveTrain").print(); return 0.0; }
             case kMotors.kRightA:
                 try { return rightA.getOutputCurrent(); }   //Return the current from motor rightA
-                catch(Exception e) { new ExceptionHandler(e, "DriveTrain").print(); return 0.0; }
+                catch(Throwable e) { new ExceptionHandler(e, "DriveTrain").print(); return 0.0; }
             case kMotors.kRightB:
                 try { return rightB.getOutputCurrent(); }   //Return the current from motor rightB
-                catch(Exception e) { new ExceptionHandler(e, "DriveTrain").print(); return 0.0; }
+                catch(Throwable e) { new ExceptionHandler(e, "DriveTrain").print(); return 0.0; }
             default: return 0.0;
         }
     }
@@ -147,10 +171,10 @@ public class DriveTrain {
         switch(side) {
             case kSides.kLeft:  //Return current from the left side motors
                 try { return ((leftA.getOutputCurrent() + leftB.getOutputCurrent())/2); }
-                catch(Exception e) { new ExceptionHandler(e, "DriveTrain").print(); return 0.0; }
+                catch(Throwable e) { new ExceptionHandler(e, "DriveTrain").print(); return 0.0; }
             case kSides.kRight: //Return the current from the right side motors
                 try { return ((rightA.getOutputCurrent() + rightB.getOutputCurrent())/2); }
-                catch(Exception e) { new ExceptionHandler(e, "DriveTrain").print(); return 0.0; }
+                catch(Throwable e) { new ExceptionHandler(e, "DriveTrain").print(); return 0.0; }
             default: return 0.0;
         }
     }
@@ -164,7 +188,7 @@ public class DriveTrain {
             //Return the average current for the entire drivetrain
             return ((leftA.getOutputCurrent() + leftB.getOutputCurrent() +
                      rightA.getOutputCurrent() + rightB.getOutputCurrent())/4);
-        } catch(Exception e) {
+        } catch(Throwable e) {
             new ExceptionHandler(e, "DriveTrain").print();
             return 0.0;
         }
