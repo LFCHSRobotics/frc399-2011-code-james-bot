@@ -41,7 +41,7 @@ public class Rumblepad2GamePad {
      * @return the Y axis
      */
     public double getRightY() {
-        return m_Pad.getRawAxis(2); //Return the right Y axis value
+        return m_Pad.getRawAxis(4); //Return the right Y axis value
     }
 
     /**
@@ -49,7 +49,7 @@ public class Rumblepad2GamePad {
      * @return the X axis
      */
     public double getRightX() {
-        return m_Pad.getRawAxis(1); //Return the right X axis value
+        return m_Pad.getRawAxis(3); //Return the right X axis value
     }
 
     /**

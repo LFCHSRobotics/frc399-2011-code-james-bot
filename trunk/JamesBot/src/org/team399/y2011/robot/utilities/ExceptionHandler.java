@@ -10,14 +10,14 @@ package org.team399.y2011.robot.utilities;
  * @author Jeremy Germita
  */
 public class ExceptionHandler {
-    private Exception m_excep;
+    private Throwable m_excep;
     private String m_subsys;
     /**
      * Constructor
      * @param e The exception
      * @param subSysName The name of the subsystem that throws the exception
      */
-    public ExceptionHandler(Exception e, String subSysName) {
+    public ExceptionHandler(Throwable e, String subSysName) {
         m_excep = e;
         m_subsys = subSysName;
     }
