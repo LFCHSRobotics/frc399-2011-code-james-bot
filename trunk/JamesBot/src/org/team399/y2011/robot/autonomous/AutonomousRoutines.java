@@ -12,6 +12,15 @@ import org.team399.y2011.robot.JamesBot;
  */
 public class AutonomousRoutines {
 
+    private static String kSide;
+    
+    /**
+     * Set the side of the field
+     * @param side The side
+     */
+    public static void setSide(String side) {
+        kSide = side;
+    }
     /**
      * Track Lines.
      */

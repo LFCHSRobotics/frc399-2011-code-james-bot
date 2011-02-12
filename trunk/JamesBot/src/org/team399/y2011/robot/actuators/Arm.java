@@ -7,6 +7,7 @@ package org.team399.y2011.robot.actuators;
 
 import edu.wpi.first.wpilibj.AnalogChannel;
 import edu.wpi.first.wpilibj.CANJaguar;
+import edu.wpi.first.wpilibj.DoubleSolenoid;
 import org.team399.y2011.robot.utilities.ExceptionHandler;
 
 /**
@@ -19,14 +20,17 @@ public class Arm {
      * Arm state interface
      */
     public interface ArmStates {
-        /**
-        public static final double kOff_val = 0;
-        public static final double kForward_val = 1;
-        public static final double kReverse_val = 2;*/
+        public static double HIGH   = 0.889;
+        public static double MID    = 1.06;
+        public static double LOW    = 1.274;
+        public static double GROUND = 1.521;
+        public static double INSIDE = 1.624;
     }
     
     private CANJaguar armA; //Instance of arm CAN Jaguar, A
     private CANJaguar armB; //Instance of arm CAN Jaguar, B
+
+    private DoubleSolenoid hinge = new DoubleSolenoid(1,2);
 
     private AnalogChannel pot;  //Instance of the potentiometer
 
@@ -46,8 +50,8 @@ public class Arm {
         }
     }
 
-    private double upperLimit = 1.12;
-    private double lowerLimit = 1.9;
+    private double upperLimit = .7964;
+    private double lowerLimit = 1.624;
 
     /**
      * Set the arm motors. Upper and lower limits are in place
@@ -81,7 +85,7 @@ public class Arm {
     }
 
     private double processValue;    //The potentiometer input
-    private final double P = 10, I = 0, D = 0; //P, I, and D values
+    private final double P = 8, I = .0001, D = 0; //P, I, and D values
     private double error, prevError, output, integral, derivative; //Other values needed by PID
     private boolean enabled = true;
 
@@ -98,12 +102,13 @@ public class Arm {
                 output       = (P*error) +                   //Calculate PID output
                                (I*integral) -
                                (D*derivative);
-                if(output > 1.0) {
-                    output = 1.0;
-                } else if(output < -1.0){
-                    output = -1.0;
+                output *= .4;
+                if(output > .40) {
+                    output = .40;
+                } else if(output < -.40){
+                    output = -.40;
                 }
-                System.out.println("O/P: " + output);
+                //System.out.println("O/P: " + output);
                 set(-output);
                 prevError = error;                   //prevError is now equal to error
             } catch(Throwable e) {
@@ -112,15 +117,15 @@ public class Arm {
         }
     }
     
-    private double setpoint;
+    public double setpoint;
     /**
      * Set the point for the arm
      * @param point the setpoint
      */
     public void setPoint(double point) {
-      if(point >= upperLimit) {
+      if(point <= upperLimit) {
         setpoint = upperLimit;
-      } else if(point <= lowerLimit) {
+      } else if(point >= lowerLimit) {
         setpoint = lowerLimit;
       } else {
         setpoint = point;
@@ -150,6 +155,20 @@ public class Arm {
      */
     public double getSetpoint() {
         return setpoint;
+    }
+
+    public void printCurrent() {
+        try {
+            System.out.println("Total Arm Current: " + (armA.getOutputCurrent() + armB.getOutputCurrent()));
+        } catch(Throwable t) {
+            t.printStackTrace();
+        }
+    }
+
+    public void fold(boolean up) {
+        DoubleSolenoid.Value state = (up) ? DoubleSolenoid.Value.kForward :
+            DoubleSolenoid.Value.kReverse;
+        hinge.set(state);
     }
 
 }
