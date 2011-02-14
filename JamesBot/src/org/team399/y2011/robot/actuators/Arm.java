@@ -20,11 +20,11 @@ public class Arm {
      * Arm state interface
      */
     public interface ArmStates {
-        public static double HIGH   = 0.889;
-        public static double MID    = 1.06;
-        public static double LOW    = 1.274;
-        public static double GROUND = 1.521;
-        public static double INSIDE = 1.624;
+        public static double HIGH   = 2.72522;
+        public static double MID    = 2.93610;
+        public static double LOW    = 3.02386;
+        public static double GROUND = 3.20355;
+        public static double INSIDE = 3.32699;
     }
     
     private CANJaguar armA; //Instance of arm CAN Jaguar, A
@@ -50,8 +50,8 @@ public class Arm {
         }
     }
 
-    private double upperLimit = .7964;
-    private double lowerLimit = 1.624;
+    private double upperLimit = 2.57;
+    private double lowerLimit = 3.4555;
 
     /**
      * Set the arm motors. Upper and lower limits are in place
@@ -85,7 +85,7 @@ public class Arm {
     }
 
     private double processValue;    //The potentiometer input
-    private final double P = 8, I = .0001, D = 0; //P, I, and D values
+    private final double P = 5, I = .0001, D = 0; //P, I, and D values
     private double error, prevError, output, integral, derivative; //Other values needed by PID
     private boolean enabled = true;
 
