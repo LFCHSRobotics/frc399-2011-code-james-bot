@@ -41,4 +41,16 @@ public class AutonomousRoutines {
     public static void disabled() {
         System.out.println("Sad robot is sad during autonomous :(");
     }
+    
+    
+    public void doScript(double[][] script) {
+
+    }
+    
+    public static class AutonomousScripts {
+        private static final double DRIVE = 0;
+        public static double[][] trackLines = {
+            {DRIVE, 0,0,0,0}
+        };
+    }
 }

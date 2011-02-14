@@ -51,7 +51,7 @@ public class JamesBot extends IterativeRobot {
     public void teleopInit() {
         compressor.start(); //Start compressor
         arm.enable();       //Enable arm PID
-        arm.setPoint(Arm.ArmStates.GROUND);
+        arm.setPoint(Arm.ArmStates.GROUND); //Bring the arm down to the ground
     }
 
     public void disabledPeriodic() {
@@ -62,7 +62,7 @@ public class JamesBot extends IterativeRobot {
     public void teleopPeriodic() {
         robot.tankDrive(leftJoy.getY(),
                         -rightJoy.getY());   //Tank drive, two sticks
-        robot.shifters(rightJoy.getTrigger() || leftJoy.getTrigger());
+        robot.shift(rightJoy.getTrigger() || leftJoy.getTrigger());
 
         claw.grab(operator.getButton(6));
         arm.setPoint(arm.getSetpoint() + (-(operator.getRightY())*.05));
@@ -86,10 +86,11 @@ public class JamesBot extends IterativeRobot {
         
         arm.fold(operator.getButton(5));
 
+        arm.update();   //Update arm pid
+
     }
 
     public void teleopContinuous() {
-        arm.update();   //Update arm pid
     }
 
     public void autonomousInit() {

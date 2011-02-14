@@ -199,7 +199,7 @@ public class DriveTrain {
     }
     
     boolean shifted = false, gear = false;
-    public void shifters(boolean shift) {
+    public void shift(boolean shift) {
         if(shift && !shifted) {
             gear = !gear;
             shiftA.set(gear);
