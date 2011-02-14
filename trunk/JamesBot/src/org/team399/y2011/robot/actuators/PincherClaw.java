@@ -28,13 +28,11 @@ public class PincherClaw {
      */
     public void grab(boolean state) {
         set = state;
-        if(set && set != prevState) {
-
+        
             DoubleSolenoid.Value setValue = (set) ? DoubleSolenoid.Value.kForward
                     : DoubleSolenoid.Value.kReverse;    //The value to set the pincher claw
             claw.set(setValue);               //Sets the pincher claw to value
-        }
-        prevState = set;
+        
     }
 
     /**

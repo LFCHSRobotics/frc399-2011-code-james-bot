@@ -6,6 +6,7 @@
 package org.team399.y2011.robot.actuators;
 import edu.wpi.first.wpilibj.CANJaguar;
 import edu.wpi.first.wpilibj.Gyro;
+import edu.wpi.first.wpilibj.Solenoid;
 import org.team399.y2011.robot.utilities.ExceptionHandler;
 
 import org.team399.y2011.robot.utilities.Math;
@@ -20,6 +21,9 @@ public class DriveTrain {
     private CANJaguar leftB;    //Left motor B
     private CANJaguar rightA;    //Right motor A
     private CANJaguar rightB;    //Right Motor B
+
+    private Solenoid shiftA = new Solenoid(5);
+    private Solenoid shiftB = new Solenoid(6);
     
     private Gyro yaw;
 
@@ -191,6 +195,18 @@ public class DriveTrain {
         } catch(Throwable e) {
             new ExceptionHandler(e, "DriveTrain").print();
             return 0.0;
+        }
+    }
+    
+    boolean shifted = false, gear = false;
+    public void shifters(boolean shift) {
+        if(shift && !shifted) {
+            gear = !gear;
+            shiftA.set(gear);
+            shiftB.set(!gear);
+            shifted = true;
+        } else if(!shift) {
+            shifted = false;
         }
     }
 
