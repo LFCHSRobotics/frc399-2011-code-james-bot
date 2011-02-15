@@ -15,10 +15,11 @@ public class LineFollow {
 
     private static LineSensorArray lsa = new LineSensorArray(1,2,3);
 
+
     public static void followLine(double speed) {
 
         if(lsa.getArrayState() == 2) {
-
+            //
         }
 
     }
