@@ -171,4 +171,8 @@ public class Arm {
         hinge.set(state);
     }
 
+    public double getPosition() {
+        return pot.getAverageValue();
+    }
+
 }

@@ -28,7 +28,7 @@ public class DeploymentMechanism {
      * DEPLOY THE MINIBOT!
      * @param state the boolean input used to deploy
      */
-    public void deploy (boolean state){
+    public void deploy(boolean state) {
         deployActuator.set(((state) ? DoubleSolenoid.Value.kForward :
             DoubleSolenoid.Value.kReverse));    //sets the solenoid
     }

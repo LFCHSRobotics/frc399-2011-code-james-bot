@@ -7,6 +7,7 @@ package org.team399.y2011.robot.actuators;
 import edu.wpi.first.wpilibj.CANJaguar;
 import edu.wpi.first.wpilibj.Gyro;
 import edu.wpi.first.wpilibj.Solenoid;
+import edu.wpi.first.wpilibj.Encoder;
 import org.team399.y2011.robot.utilities.ExceptionHandler;
 
 import org.team399.y2011.robot.utilities.Math;
@@ -22,10 +23,13 @@ public class DriveTrain {
     private CANJaguar rightA;    //Right motor A
     private CANJaguar rightB;    //Right Motor B
 
-    private Solenoid shiftA = new Solenoid(5);
+    private Solenoid shiftA = new Solenoid(5);  //Shifter solenoids
     private Solenoid shiftB = new Solenoid(6);
+
+    private Encoder leftEnc  = new Encoder(4, 5);   //drive Encoders
+    private Encoder rightEnc = new Encoder(6, 7);
     
-    private Gyro yaw;
+    private Gyro yaw;   //Gyro
 
     /**
      * Constructor
@@ -141,7 +145,7 @@ public class DriveTrain {
      * @param hold Whether or not to hold
      */
     public void holdPosition(boolean hold) {
-
+        //TODO: test hold position method
     }
     /**
      * Get Current at a single motor
