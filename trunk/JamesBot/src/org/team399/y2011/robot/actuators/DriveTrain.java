@@ -23,8 +23,8 @@ public class DriveTrain {
     private CANJaguar rightA;    //Right motor A
     private CANJaguar rightB;    //Right Motor B
 
-    private Solenoid shiftA = new Solenoid(5);  //Shifter solenoids
-    private Solenoid shiftB = new Solenoid(6);
+    private Solenoid shiftA = new Solenoid(7);  //Shifter solenoids
+    private Solenoid shiftB = new Solenoid(8);
 
     private Encoder leftEnc  = new Encoder(4, 5);   //drive Encoders
     private Encoder rightEnc = new Encoder(6, 7);

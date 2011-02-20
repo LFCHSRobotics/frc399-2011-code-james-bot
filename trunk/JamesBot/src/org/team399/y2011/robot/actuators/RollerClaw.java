@@ -20,8 +20,8 @@ public class RollerClaw {
      */
     public RollerClaw() {
         try {
-            rollerA = new CANJaguar(8); //Create CANJaguar objects on addresses
-            rollerB = new CANJaguar(9); //8 and 9
+            rollerA = new CANJaguar(3); //Create CANJaguar objects on addresses
+            rollerB = new CANJaguar(9); //3 and 9
         } catch(Exception e) {
             e.printStackTrace();
             System.out.println("ERROR INITIALIZING ROLLER CLAW");

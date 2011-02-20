@@ -7,7 +7,8 @@ package org.team399.y2011.robot.actuators;
 
 import edu.wpi.first.wpilibj.AnalogChannel;
 import edu.wpi.first.wpilibj.CANJaguar;
-import edu.wpi.first.wpilibj.DoubleSolenoid;
+import edu.wpi.first.wpilibj.Solenoid;
+import edu.wpi.first.wpilibj.DigitalInput;
 import org.team399.y2011.robot.utilities.ExceptionHandler;
 
 /**
@@ -16,42 +17,50 @@ import org.team399.y2011.robot.utilities.ExceptionHandler;
  */
 public class Arm {
     //TODO:  EDIT ArmState INTERFACE VALUES FOR PID SETPOINTS
+    //TODO:  FOR SETPOINTS, USE A RELATIVE SYSTEM. START ARM IN "DOWN" POSITION, EACH SETPOINT IS X FROM DOWN
     /**
      * Arm state interface
      */
     public interface ArmStates {
-        public static double HIGH   = 2.72522;
-        public static double MID    = 2.93610;
-        public static double LOW    = 3.02386;
-        public static double GROUND = 3.20355;
-        public static double INSIDE = 3.32699;
+        public static double HIGH   = 1.82000;
+        public static double MID    = 2.01542;
+        public static double LOW    = 2.14402;
+        public static double GROUND = 2.88155;
+        public static double INSIDE = 2.27775;
     }
     
     private CANJaguar armA; //Instance of arm CAN Jaguar, A
     private CANJaguar armB; //Instance of arm CAN Jaguar, B
 
-    private DoubleSolenoid hinge = new DoubleSolenoid(1,2);
+    private Solenoid hingeA;
+    private Solenoid hingeB;
 
     private AnalogChannel pot;  //Instance of the potentiometer
+    private DigitalInput reedSwitch;
 
     /**
      * Constructor
      */
-    public Arm() {
-        pot = new AnalogChannel(1); //potentiometer
+    public Arm(int aPort, int bPort) {
+        pot = new AnalogChannel(1); //potentiometer on analog 1
+        hingeA = new Solenoid(aPort);  //Arm hinge solenoid
+        hingeB = new Solenoid(bPort);  //Arm hinge solenoid
+        reedSwitch = new DigitalInput(13);  //Reed switch
         try {
             armA = new CANJaguar(4);    //armA is a CANJaguar with the address 6
             armB = new CANJaguar(7);    //armB is a CANJaguar with the address 7
             armA.configNeutralMode(CANJaguar.NeutralMode.kBrake); //Brake the motors
-            armB.configNeutralMode(CANJaguar.NeutralMode.kBrake);
+            armB.configNeutralMode(CANJaguar.NeutralMode.kBrake); //Brake the motors
+            //armA.setSafetyEnabled(true);    //Enable safety on the arm.
+            //armB.setSafetyEnabled(true);    //We don't want to kill anyone. :P
         } catch(Throwable e) {
             System.out.print("ERROR INITIALIZING ARM");
             new ExceptionHandler(e, "Arm").print();
         }
     }
 
-    private double upperLimit = 2.57;
-    private double lowerLimit = 3.4555;
+    private double upperLimit = 1.4856844;
+    private double lowerLimit = ArmStates.INSIDE;
 
     /**
      * Set the arm motors. Upper and lower limits are in place
@@ -71,6 +80,7 @@ public class Arm {
                 armA.setX(((value <= 0) ? value : 0 ) , (byte) 2);   //Set arm motors to value only if it is positive
                 armB.setX(((value <= 0) ? value : 0 ), (byte) 2);
             }
+
             CANJaguar.updateSyncGroup((byte) 2);    //Update the Sync group
         } catch(Throwable e) {
             new ExceptionHandler(e, "Arm").print();
@@ -82,10 +92,15 @@ public class Arm {
      */
     public void print() {
         System.out.println("Potentiometer Value: " + pot.getAverageVoltage());
+        System.out.println("Setpoint: " + setpoint);
+    }
+
+    public boolean getReedSwitch() {
+        return reedSwitch.get();
     }
 
     private double processValue;    //The potentiometer input
-    private final double P = 5, I = .0001, D = 0; //P, I, and D values
+    private final double P = 3, I = 0.0001, D = 0; //P, I, and D values
     private double error, prevError, output, integral, derivative; //Other values needed by PID
     private boolean enabled = true;
 
@@ -102,13 +117,12 @@ public class Arm {
                 output       = (P*error) +                   //Calculate PID output
                                (I*integral) -
                                (D*derivative);
-                output *= .4;
-                if(output > .40) {
-                    output = .40;
-                } else if(output < -.40){
-                    output = -.40;
+                
+                if(output > speedLimit) {       //Output limiting
+                    output = speedLimit;
+                } else if(output < -speedLimit){
+                    output = -speedLimit;
                 }
-                //System.out.println("O/P: " + output);
                 set(-output);
                 prevError = error;                   //prevError is now equal to error
             } catch(Throwable e) {
@@ -116,8 +130,13 @@ public class Arm {
             }
         }
     }
+    private double speedLimit = 1;
+
+    public void setSpeedLimit(double limit) {
+        this.speedLimit = limit;
+    }
     
-    public double setpoint;
+    public double setpoint = ArmStates.MID;
     /**
      * Set the point for the arm
      * @param point the setpoint
@@ -149,6 +168,11 @@ public class Arm {
         set(0.0);
     }
 
+    public void reset() {
+        disable();
+        enable();
+    }
+
     /**
      * return the setpoint
      * @return the setpoint
@@ -157,19 +181,32 @@ public class Arm {
         return setpoint;
     }
 
-    public void printCurrent() {
+    /**
+     * Print the average current pulled by the arm
+     * @return The average arm current
+     */
+    public double getCurrent() {
         try {
-            System.out.println("Total Arm Current: " + (armA.getOutputCurrent() + armB.getOutputCurrent()));
+            return ((armA.getOutputCurrent() + armB.getOutputCurrent())/2);
         } catch(Throwable t) {
             t.printStackTrace();
+            return 0;
         }
     }
 
-    public void fold(boolean up) {
-        DoubleSolenoid.Value state = (up) ? DoubleSolenoid.Value.kForward :
-            DoubleSolenoid.Value.kReverse;
-        hinge.set(state);
+
+    boolean shifted = false, gear = false;
+    public void fold(boolean shift) {
+        if(shift && !shifted) {
+            gear = !gear;
+            hingeA.set(gear);
+            hingeB.set(!gear);
+            shifted = true;
+        } else if(!shift) {
+            shifted = false;
+        }
     }
+
 
     public double getPosition() {
         return pot.getAverageValue();
