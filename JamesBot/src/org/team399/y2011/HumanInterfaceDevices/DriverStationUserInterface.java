@@ -15,12 +15,12 @@ public class DriverStationUserInterface {
 
     private DriverStationEnhancedIO m_io;   //IO board object
 
-    final short BLUE_BUTTON     = 1;
-    final short RED_BUTTON      = 2;
+    final short BLUE_BUTTON     = 11;
+    final short RED_BUTTON      = 9;
     final short WHITE_BUTTON    = 3;
     final short BLACK_BUTTON    = 4;
     final short TOGGLE_SWITCH   = 5;
-    final short MISSILE_SWITCH  = 6;
+    final short MISSILE_SWITCH  = 2;
     final short EASY_BUTTON     = 7;
 
 

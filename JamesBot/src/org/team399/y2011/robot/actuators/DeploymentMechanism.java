@@ -21,7 +21,7 @@ public class DeploymentMechanism {
      * @param actuator port b
      */
     public DeploymentMechanism(int a, int b) {
-        deployActuator = new DoubleSolenoid(a, b);  //Instantiates the Double solenoid
+        deployActuator = new DoubleSolenoid(7, a, b);  //Instantiates the Double solenoid
     }
 
     /**
