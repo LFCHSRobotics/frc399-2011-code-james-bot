@@ -12,7 +12,7 @@ import edu.wpi.first.wpilibj.DigitalInput;
  */
 public class LineSensorArray {
     private int A, B, C;                //The light sensor ports
-    private DigitalInput[] sensorArray; //sensor array
+    private DigitalInput sensorA, sensorB, sensorC; //sensor array
 
     /**
      * Constructor
@@ -25,18 +25,19 @@ public class LineSensorArray {
         B = portB;
         C = portC;
 
-        sensorArray[0] = new DigitalInput(A);   //Sensor array, index 0
-        sensorArray[1] = new DigitalInput(B);   //Sensor array, index 1
-        sensorArray[2] = new DigitalInput(C);   //Sensor array, index 2
+        sensorA = new DigitalInput(A);   //Sensor array, index 0
+        sensorB = new DigitalInput(B);   //Sensor array, index 1
+        sensorC = new DigitalInput(C);   //Sensor array, index 2
     }
 
     /**
      * Return the value from a single sensor
      * @param index The sensor to poll. 0-2
      * @return The state of said sensor
+     * @deprecated
      */
     public boolean getRawSensor(int index) {
-        return sensorArray[index].get();    //Get the value from the sensor
+        return false;//sensorArray[index].get();    //Get the value from the sensor
     }
 
     /**
@@ -44,9 +45,20 @@ public class LineSensorArray {
      * @return  Return the state in decimal(converted from binary)
      */
     public int getArrayState() {
-        return (sensorArray[0].get() ? 1 : 0) +
-               (sensorArray[1].get() ? 2 : 0) +
-               (sensorArray[2].get() ? 4 : 0);
+        return (sensorA.get() ? 1 : 0) +
+               (sensorB.get() ? 2 : 0) +
+               (sensorC.get() ? 4 : 0);
+    }
+    public boolean getA() {
+        return sensorA.get();
+    }
+
+    public boolean getB() {
+        return sensorB.get();
+    }
+
+    public boolean getC() {
+        return sensorC.get();
     }
 
     /**

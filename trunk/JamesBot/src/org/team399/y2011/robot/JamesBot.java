@@ -10,16 +10,15 @@ package org.team399.y2011.robot;
 
 import org.team399.y2011.robot.actuators.DriveTrain;
 import org.team399.y2011.robot.actuators.Arm;
-import org.team399.y2011.robot.actuators.PincherClaw;
 import org.team399.y2011.robot.actuators.RollerClaw;
 import org.team399.y2011.robot.autonomous.AutonomousRoutines;
 import org.team399.y2011.HumanInterfaceDevices.Attack3Joystick;
 import org.team399.y2011.HumanInterfaceDevices.Rumblepad2GamePad;
 import edu.wpi.first.wpilibj.IterativeRobot;
 import edu.wpi.first.wpilibj.Compressor;
+import edu.wpi.first.wpilibj.Timer;
 import org.team399.y2011.robot.actuators.DeploymentMechanism;
 import org.team399.y2011.robot.actuators.Flopper;
-import org.team399.y2011.robot.sensors.LineSensorArray;
 
 
 /**
@@ -128,18 +127,30 @@ public class JamesBot extends IterativeRobot {
 
     public void teleopContinuous() {
     }
-
+long starttime;
     public void autonomousInit() {
         compressor.start();
         arm.enable();
+        AutonomousRoutines.autonOne();
         AutonomousRoutines.setSide(autonomousSide);
+        starttime = System.currentTimeMillis();
     }
-    public void autonomousContinuous() {
-        switch(autonomousMode) {
+    public void autonomousPeriodic() {
+        //
+        arm.update();
+
+        arm.fold(true);
+        //Timer.delay(3);
+        //arm.disable();
+        if(System.currentTimeMillis() - starttime > 4000) {
+            roller.articulate(1);
+        }
+
+        /*switch(autonomousMode) {
             case 0: AutonomousRoutines.disabled(); break;
             case 1: AutonomousRoutines.autonOne(); break;
             case 2: AutonomousRoutines.autonTwo(); break;
-        }
+        }*/
     }
 
 }
