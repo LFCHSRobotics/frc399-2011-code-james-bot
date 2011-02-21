@@ -4,10 +4,9 @@
  */
 
 package org.team399.y2011.robot.autonomous;
-import edu.wpi.first.wpilibj.Timer;
 import org.team399.y2011.robot.JamesBot;
+import org.team399.y2011.robot.actuators.Arm;
 import org.team399.y2011.robot.sensors.LineSensorArray;
-//  import edu.wpi.first.wpilibj.Timer;             // initialize Timer for Auton. JKG 2/14
 
 
 /**
@@ -30,28 +29,26 @@ public class AutonomousRoutines {
      * Track Lines.
      */
     public static void autonOne() {
-        System.out.println(lsa.getArrayState());
-    }
+        long startTime = System.currentTimeMillis();
+        while(System.currentTimeMillis() - startTime < 7000) {
+            while(System.currentTimeMillis() - startTime < 4000) {
+                if(lsa.getA()) {
+                    JamesBot.robot.tankDrive(-.5, .5);
+                } else {
+                    //Check to see if the drivetrain drifts to the right/left, adjust
+                    JamesBot.robot.tankDrive(-.5, .3);
+                }
+            }
+            JamesBot.robot.tankDrive(0, 0);
 
+            JamesBot.arm.setPoint(Arm.ArmStates.HIGH);
+            
+            //while(Math.abs(JamesBot.arm.getPosition() - JamesBot.arm.getSetpoint()) < .06) {
+                //JamesBot.arm.update();
+            //}
 
-
-      /* public static void autonLeftLine() {
-            arm.setPoint(Arm.ArmStates.HIGH);
-            AutonomousRoutines.LineFollow();
-            claw.grab(false);
-
-            JamesBot.robot.tankDrive(-1,-1);
-           Timer.delay(2);
-           JamesBot.robot.tankDrive(1,1);
-           Timer.delay(5);
-           JamesBot.robot.tankDrive(0,0);
         }
-     * JKG 2/14 12:30pm
-     * Set arm to High
-     * line follow until the end of the tape
-     * Open claw, release tube
-     * drive out reverse for 2 seconds, then turn around and drive forward for 5
-     */
+    }
 
     /**
      * Spin
@@ -59,8 +56,6 @@ public class AutonomousRoutines {
     public static void autonTwo() {
         JamesBot.robot.tankDrive(-1, 1);
     }
-
-    private void test() {}
 
     /**
      * Do nothing in autonomous mode
@@ -78,37 +73,43 @@ public class AutonomousRoutines {
             startTime = System.currentTimeMillis();
             switch((int)script[current][0]) {
                 case (int)AutonomousScripts.DRIVE:
-                    drive(script[current][1],
-                         (script[current][2] == 1.0),
-                          script[current][3],
-                          script[current][4]);
+                    drive(script[current][1],           //First arg, power
+                         (script[current][2] == AutonomousScripts.DISTANCE),   //Second arg, Distance/time select
+                          script[current][3],           //Third arg, distance/time
+                          script[current][4]);          //Fourth arg, timout
                     break;
                 case (int)AutonomousScripts.WAIT:
-                    //wait();
+                    pause((long)script[current][1]);
+                    break;
+                case (int)AutonomousScripts.TURN:
+                    turn(script[current][1], 
+                            script[current][2],
+                      (long)script[current][4]);
             }
             current++;
         }
     }
 
     private static void drive(double power, boolean dist, double distTime, double timeOut) {
-        while(System.currentTimeMillis() - startTime < timeOut) {
-            if(dist) {
-                while(true) {   //TODO: CHANGE BOOLEAN TO ENCODER DISTANCE
+        if(dist) {
+            while(true && !(System.currentTimeMillis() - startTime < timeOut)) {   //TODO: CHANGE BOOLEAN TO ENCODER DISTANCE
 
-                }
-            } else {
-                while(System.currentTimeMillis() - startTime < distTime) {
-                    JamesBot.robot.tankDrive(power, power);
-                }
-                JamesBot.robot.tankDrive(0,0);
             }
+        } else {
+            while(System.currentTimeMillis() - startTime < distTime && !(System.currentTimeMillis() - startTime < timeOut)) {
+                JamesBot.robot.tankDrive(power, power);
+            }
+            JamesBot.robot.tankDrive(0,0);
         }
-        JamesBot.robot.tankDrive(0,0);
+    }
+
+    private static void turn(double power, double ange, long timeout) {
+
     }
 
     private static void pause(long wait) {
         while(System.currentTimeMillis() - startTime < wait) {
-
+            System.out.println("Wait for it...");
         }
 
     }
@@ -119,13 +120,13 @@ public class AutonomousRoutines {
         private static final double WAIT  = 2;  //Wait for a determined time
         private static final double FOLLOW= 3;  //Follow the lines
         private static final double ARM_SET=4;  //Set the arm to the setpoint
-        private static final double SCORE = 5;  //Score the ubertube
+        private static final double ARM_FOLD=5; //Fold the arm
+        private static final double SCORE = 6;  //Score the ubertube
         private static final double END   = 99;
 
         /* Drive arguments: */
         private static final double DISTANCE = 50;
         private static final double TIME     = 51;
-
 
         /*
          * Command:    Arg1:        Arg2:        Arg3:        Arg4:

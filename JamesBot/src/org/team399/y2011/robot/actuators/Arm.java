@@ -22,11 +22,11 @@ public class Arm {
      * Arm state interface
      */
     public interface ArmStates {
-        public static double HIGH   = 1.82000;
+        public static double HIGH   = 2.133742609;
         public static double MID    = 2.01542;
         public static double LOW    = 2.14402;
-        public static double GROUND = 2.88155;
-        public static double INSIDE = 2.27775;
+        public static double GROUND = 2.622357914;
+        public static double INSIDE = 2.69436438;
     }
     
     private CANJaguar armA; //Instance of arm CAN Jaguar, A
@@ -59,7 +59,7 @@ public class Arm {
         }
     }
 
-    private double upperLimit = 1.4856844;
+    private double upperLimit = 1.9794430390000002;
     private double lowerLimit = ArmStates.INSIDE;
 
     /**
@@ -130,7 +130,7 @@ public class Arm {
             }
         }
     }
-    private double speedLimit = 1;
+    private double speedLimit = .3;
 
     public void setSpeedLimit(double limit) {
         this.speedLimit = limit;
