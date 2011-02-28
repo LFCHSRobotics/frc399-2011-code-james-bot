@@ -23,10 +23,10 @@ public class Arm {
      */
     public interface ArmStates {
         public static double HIGH   = 2.133742609;
-        public static double MID    = 2.01542;
-        public static double LOW    = 2.14402;
-        public static double GROUND = 2.622357914;
-        public static double INSIDE = 2.69436438;
+        public static double MID    = 2.2;
+        public static double LOW    = 2.3;//2.14402;
+        public static double GROUND = 2.411481835;
+        public static double INSIDE = 2.504061577;
     }
     
     private CANJaguar armA; //Instance of arm CAN Jaguar, A
@@ -59,7 +59,7 @@ public class Arm {
         }
     }
 
-    private double upperLimit = 1.9794430390000002;
+    private double upperLimit = 1.7325637270000003;
     private double lowerLimit = ArmStates.INSIDE;
 
     /**
@@ -68,19 +68,22 @@ public class Arm {
      */
     public void set(double value) {
         try {
-            if(pot.getAverageVoltage() > upperLimit &&      //Upper and lower limit logic
-                    pot.getAverageVoltage() < lowerLimit) {
-                armA.setX(value, (byte) 2);   //Set armA to the argument, value
-                armB.setX(value, (byte) 2);  //Set armB to the argument, value, times -1
+            if(/*getReedSwitch()*/ true) {
+                if(pot.getAverageVoltage() > upperLimit &&      //Upper and lower limit logic
+                        pot.getAverageVoltage() < lowerLimit) {
+                    armA.setX(value, (byte) 2);   //Set armA to the argument, value
+                    armB.setX(value, (byte) 2);  //Set armB to the argument, value, times -1
 
-            } else if(pot.getAverageVoltage() > upperLimit) {
-                armA.setX(((value >= 0) ? value : 0 ) , (byte) 2); //Set arm motors to value only if it is negative
-                armB.setX(((value >= 0) ? value : 0 ), (byte) 2);
-            } else if(pot.getAverageVoltage() < lowerLimit) {
-                armA.setX(((value <= 0) ? value : 0 ) , (byte) 2);   //Set arm motors to value only if it is positive
-                armB.setX(((value <= 0) ? value : 0 ), (byte) 2);
+                } else if(pot.getAverageVoltage() > upperLimit) {
+                    armA.setX(((value >= 0) ? value : 0 ) , (byte) 2); //Set arm motors to value only if it is negative
+                    armB.setX(((value >= 0) ? value : 0 ), (byte) 2);
+                } else if(pot.getAverageVoltage() < lowerLimit) {
+                    armA.setX(((value <= 0) ? value : 0 ) , (byte) 2);   //Set arm motors to value only if it is positive
+                    armB.setX(((value <= 0) ? value : 0 ), (byte) 2);
+                }
+            } else {
+                //armA
             }
-
             CANJaguar.updateSyncGroup((byte) 2);    //Update the Sync group
         } catch(Throwable e) {
             new ExceptionHandler(e, "Arm").print();
@@ -96,7 +99,7 @@ public class Arm {
     }
 
     public boolean getReedSwitch() {
-        return reedSwitch.get();
+        return !reedSwitch.get();
     }
 
     private double processValue;    //The potentiometer input
@@ -130,7 +133,7 @@ public class Arm {
             }
         }
     }
-    private double speedLimit = .3;
+    private double speedLimit = 1;
 
     public void setSpeedLimit(double limit) {
         this.speedLimit = limit;
@@ -206,10 +209,8 @@ public class Arm {
             shifted = false;
         }
     }
-
-
+    
     public double getPosition() {
         return pot.getAverageValue();
     }
-
 }

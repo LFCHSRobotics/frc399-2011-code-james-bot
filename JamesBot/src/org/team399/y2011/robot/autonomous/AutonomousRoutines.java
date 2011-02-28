@@ -30,18 +30,20 @@ public class AutonomousRoutines {
      */
     public static void autonOne() {
         long startTime = System.currentTimeMillis();
-        while(System.currentTimeMillis() - startTime < 7000) {
-            while(System.currentTimeMillis() - startTime < 4000) {
-                if(lsa.getA()) {
+        JamesBot.arm.setPoint(Arm.ArmStates.HIGH);
+        while(System.currentTimeMillis() - startTime < 1000) {
+            while(System.currentTimeMillis() - startTime < 2000) {
+                
+                //if(lsa.getA()) {
                     JamesBot.robot.tankDrive(-.5, .5);
-                } else {
+                //} else {
                     //Check to see if the drivetrain drifts to the right/left, adjust
-                    JamesBot.robot.tankDrive(-.5, .3);
-                }
+                    //JamesBot.robot.tankDrive(-.5, .3);
+                //}
             }
             JamesBot.robot.tankDrive(0, 0);
 
-            JamesBot.arm.setPoint(Arm.ArmStates.HIGH);
+            
             
             //while(Math.abs(JamesBot.arm.getPosition() - JamesBot.arm.getSetpoint()) < .06) {
                 //JamesBot.arm.update();

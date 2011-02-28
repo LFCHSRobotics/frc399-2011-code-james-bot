@@ -16,11 +16,11 @@ public class DriverStationUserInterface {
     private DriverStationEnhancedIO m_io;   //IO board object
 
     final short BLUE_BUTTON     = 11;
-    final short RED_BUTTON      = 9;
-    final short WHITE_BUTTON    = 3;
-    final short BLACK_BUTTON    = 4;
+    final short RED_BUTTON      = 1;
+    final short WHITE_BUTTON    = 9;
+    final short BLACK_BUTTON    = 3;
     final short TOGGLE_SWITCH   = 5;
-    final short MISSILE_SWITCH  = 2;
+    final short MISSILE_SWITCH  = 4;
     final short EASY_BUTTON     = 7;
 
 
@@ -36,7 +36,7 @@ public class DriverStationUserInterface {
      * @return blue button's state
      */
     public boolean getBlueButton() {
-        return getDigital(BLUE_BUTTON);
+        return !getDigital(BLUE_BUTTON);
     }
 
     /**
@@ -44,7 +44,7 @@ public class DriverStationUserInterface {
      * @return The red button's state
      */
     public boolean getRedButton() {
-        return getDigital(RED_BUTTON);
+        return !getDigital(RED_BUTTON);
     }
 
     /**
@@ -52,7 +52,7 @@ public class DriverStationUserInterface {
      * @return The white button's state
      */
     public boolean getWhiteButton() {
-        return getDigital(WHITE_BUTTON);
+        return !getDigital(WHITE_BUTTON);
     }
 
     /**
@@ -60,7 +60,7 @@ public class DriverStationUserInterface {
      * @return The black button's state
      */
     public boolean getBlackButton() {
-        return getDigital(BLACK_BUTTON);
+        return !getDigital(BLACK_BUTTON);
     }
 
     /**
@@ -68,7 +68,7 @@ public class DriverStationUserInterface {
      * @return The toggle switch's state
      */
     public boolean getToggleSwitch() {
-        return getDigital(TOGGLE_SWITCH);
+        return !getDigital(TOGGLE_SWITCH);
     }
 
     /**
@@ -76,7 +76,7 @@ public class DriverStationUserInterface {
      * @return The missle switch's state
      */
     public boolean getMissileSwitch() {
-        return getDigital(MISSILE_SWITCH);
+        return !getDigital(MISSILE_SWITCH);
     }
 
     /**
