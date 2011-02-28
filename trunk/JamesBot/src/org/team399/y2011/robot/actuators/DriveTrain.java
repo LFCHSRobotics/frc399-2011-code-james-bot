@@ -26,8 +26,8 @@ public class DriveTrain {
     private Solenoid shiftA = new Solenoid(7);  //Shifter solenoids
     private Solenoid shiftB = new Solenoid(8);
 
-    private Encoder leftEnc  = new Encoder(4, 5);   //drive Encoders
-    private Encoder rightEnc = new Encoder(6, 7);
+    private Encoder encoder  = new Encoder(10, 11);   //drive Encoders
+    //private Encoder rightEnc = new Encoder(6, 7);
     
     private Gyro yaw;   //Gyro
 
@@ -35,6 +35,7 @@ public class DriveTrain {
      * Constructor
      */
     public DriveTrain() {
+        encoder.start();
         try {
             leftA  = new CANJaguar(6);    //Left motor A
             leftB  = new CANJaguar(8);    //Left motor B
@@ -55,6 +56,45 @@ public class DriveTrain {
             } catch(Throwable t) {
                 t.printStackTrace();
             }
+        }
+    }
+
+    /**
+     * Reset the drivetrain encoder
+     */
+    public void resetEncoder() {
+        encoder.reset();
+    }
+
+    /**
+     * Get the raw encoder count
+     * @return the encoder count
+     */
+    public double getEncoderCounts() {
+        return encoder.get();
+    }
+
+    public void stopEncoder() {
+        encoder.stop();
+    }
+
+    public void startEncoder() {
+        encoder.start();
+    }
+    
+    public void driveStraight(double counts, double throttle, double angle) {
+        //final double P = .5
+        //double error = angle - yaw.getAngle();
+        //double output = (P*angle);
+        //if(output > 1) {
+        //    output = 1;
+        //} else if(-output < -1) {
+        //    output = -1;
+        //}
+        if(getEncoderCounts() < counts) {
+            tankDrive(throttle/*-output*/, throttle/*+output*/);
+        } else {
+            tankDrive(0,0);
         }
     }
 
