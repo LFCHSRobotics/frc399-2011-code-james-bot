@@ -36,6 +36,7 @@ public class JamesBot extends IterativeRobot {
     Attack3Joystick leftJoy  = new Attack3Joystick(1);    //Left Joystick
     Attack3Joystick rightJoy = new Attack3Joystick(2);    //Right Joystick
     Rumblepad2GamePad operator = new Rumblepad2GamePad(3);//Operator gamepad
+
     DriverStationUserInterface io = new DriverStationUserInterface();
 
     //public static LineSensorArray lsa = new LineSensorArray(1,2,3);
@@ -44,10 +45,10 @@ public class JamesBot extends IterativeRobot {
     DeploymentMechanism deploy = new DeploymentMechanism(3,4);  //Deployment mechanism instance
     //PincherClaw claw           = new PincherClaw        (3,4);  //Pincher claw instance
     Flopper flopper            = new Flopper            (1,2);  //Flopper mechanism instance
-    public static Arm arm      = new Arm                (5,6);  //Arm instance
+    public static Arm arm      = new Arm                (5,6);  //Armkickbutt instance
     public static RollerClaw roller= new RollerClaw();
 
-    Gyro yaw = new Gyro(2);
+    public static Gyro yaw = new Gyro(2);
     Compressor compressor = new Compressor(14,1);   //Compressor instance
 
     int autonomousMode = 0;
@@ -55,27 +56,34 @@ public class JamesBot extends IterativeRobot {
     
     public void disabledInit() {
         arm.disable();  //Disable arm PID control
-        arm.setPoint(arm.getPosition());
+        
     }
 
     public void robotInit() {
         yaw.reset();
+        robot.stopEncoder();
+        robot.startEncoder();
     }
 
     long startTime;
     public void teleopInit() {
+        arm.setPoint(Arm.ArmStates.HIGH);
         compressor.start(); //Start compressor
+        arm.print();
         arm.reset();
         arm.update();
         startTime = System.currentTimeMillis();
         arm.setSpeedLimit(1);
+        robot.tankDrive(0,0);
     }
 
     public void disabledPeriodic() {
        arm.print();    //Print arm pot value
-       System.out.println("Gyro:    " + yaw.getAngle());
-       System.out.println("Encoder: " + robot.getEncoderCounts());
-      
+
+       //arm.setPoint(arm.getPosition());
+       //System.out.println("Enc: " + robot.getEncoderCounts());
+       //System.out.println("Gyro:" + yaw.getAngle());
+
        if(io.getWhiteButton()) {
            autonomousMode = 1;
        } else if(io.getBlackButton()) {
@@ -85,7 +93,7 @@ public class JamesBot extends IterativeRobot {
        } else if(io.getBlueButton()) {
            autonomousMode = 4;
        }
-       System.out.println("Autonomous Mode: " + autonomousMode);
+       //System.out.println("Autonomous Mode: " + autonomousMode);
     }
 
     public void teleopPeriodic() {
@@ -99,7 +107,7 @@ public class JamesBot extends IterativeRobot {
 
         //claw.grab(operator.getButton(6));
         
-        arm.enable();
+        arm.enable();/*
         if(operator.getButton(2)) {             //If the operator presses button 2,
             arm.setPoint(Arm.ArmStates.LOW);    //Bring the arm into the low position
         } else if(operator.getButton(3)) {      //Else if they press button 3,
@@ -108,31 +116,38 @@ public class JamesBot extends IterativeRobot {
             arm.setPoint(Arm.ArmStates.HIGH);   //Bring the arm into the high posision
         } else if(operator.getButton(1)) {      //Else if they press button 1,
             arm.setPoint(Arm.ArmStates.GROUND); //Bring it into the ground position
-        }
+        }*/
+        
         if(Math.abs(operator.getRightY()) > 0.1) {
             arm.setPoint(arm.getSetpoint() + (operator.getRightY()*.05));
         }
+        //arm.set(-operator.getRightY()*.5);
         
 
         if(operator.getButton(6)) {
-            roller.grab(.4);                    // Grab tube
+            roller.grab(1);                    // Grab tube
         } else if(operator.getButton(8)) {
-            roller.grab(-.4);                   // release tube
-        } else if(operator.getButton(5)) {
-            roller.articulate(1);              // articulate tube up
+            roller.grab(-.5);                   // release tube
         } else if(operator.getButton(7)) {
-            roller.articulate(-.7);             // articulate tube down
+            roller.articulate(.5);              // articulate tube up
+        } else if(operator.getButton(5)) {
+            roller.articulate(-.5);             // articulate tube down
         } else {
-            roller.grab(0);
+            roller.grab(operator.getLeftY());
+            //roller.articulate(operator.getLeftX());
         }
+
+
+
 
         arm.fold(operator.getButton(10));
         flopper.flop(operator.getButton(9));
-        deploy.deploy(io.getMissileSwitch() && io.getBlackButton());
+        deploy.deploy(operator.getButton(1) && operator.getButton(2) );
         arm.update();   //Update arm pid
     }
     long starttime;
     public void autonomousInit() {
+        /*
         //arm.fold(true); //commented out by john and brian to prevent folding in frame
         compressor.start();
         arm.fold(false);
@@ -141,40 +156,31 @@ public class JamesBot extends IterativeRobot {
         JamesBot.arm.setPoint(Arm.ArmStates.HIGH);
         //AutonomousRoutines.autonOne();
         AutonomousRoutines.setSide(autonomousSide);
-        starttime = System.currentTimeMillis();
+        starttime = System.currentTimeMillis();*/
+        robot.resetEncoder();
+        yaw.reset();
+        robot.setGyro(yaw);
+        compressor.start(); //Start compressor
+        AutonomousRoutines.startTimer();
+        JamesBot.arm.setPoint(Arm.ArmStates.HIGH);
     }
 
     public void autonomousPeriodic() {
-        if(System.currentTimeMillis() - starttime > 1000) {
-            robot.tankDrive(-.5, .5);
-             System.out.println("drive");
-        }
-        arm.update();
-        if(System.currentTimeMillis() - starttime > 1750) {
-            arm.fold(true);
-             System.out.println("arm fold");
-        }
+        JamesBot.arm.setPoint(Arm.ArmStates.HIGH);
+       //System.out.println("Enc: " + robot.getEncoderCounts());
+       //System.out.println("Gyro:" + yaw.getAngle());
+       //AutonomousRoutines.oneTubeAuton();
+       //AutonomousRoutines.hold();
 
-        if(System.currentTimeMillis() - starttime > 2500)
-        {
-            robot.tankDrive(0,0); 
-        }
-        //arm.fold(true);
-        //flopper.flop(true);
-        //Timer.delay(3);
-        //arm.disable();
-        if(System.currentTimeMillis() - starttime > 4750) {
-            roller.articulate(1);
-        } else if(System.currentTimeMillis() - starttime > 8750) {
-            roller.articulate(0);
-        } else if(System.currentTimeMillis() - starttime > 13750) {
-            robot.tankDrive(.7, -.7);
-        }
-
-        /*switch(autonomousMode) {
-            case 0: AutonomousRoutines.disabled(); break;
-            case 1: AutonomousRoutines.autonOne(); break;
-            case 2: AutonomousRoutines.autonTwo(); break;
-        }*/
+       switch(autonomousMode) {
+           case 1:
+               AutonomousRoutines.dumbAuton(); break;
+           case 2:
+               robot.driveStraight(2188*10, .6, 0); break;
+           default:
+               AutonomousRoutines.dumbAuton(); break;
+       }
+       //AutonomousRoutines.dumbAuton();
+       //robot.tankDrive(-.5, .5);
     }
 }
