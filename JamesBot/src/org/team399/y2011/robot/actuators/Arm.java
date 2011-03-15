@@ -16,13 +16,15 @@ import org.team399.y2011.robot.utilities.ExceptionHandler;
  * @author Jeremy Germita
  */
 public class Arm {
+    private static double lowerLimit = 2.40576524;
+    private static double upperLimit = lowerLimit - 1.1778200509999999; //1.4599678200000001;
     //TODO:  EDIT ArmState INTERFACE VALUES FOR PID SETPOINTS
     //TODO:  FOR SETPOINTS, USE A RELATIVE SYSTEM. START ARM IN "DOWN" POSITION, EACH SETPOINT IS X FROM DOWN
     /**
      * Arm state interface
      */
     public interface ArmStates {
-        public static double HIGH   = 2.133742609;
+        public static double HIGH   = lowerLimit - 0.6994913839999999;   //0.6994913839999999
         public static double MID    = 2.2;
         public static double LOW    = 2.3;//2.14402;
         public static double GROUND = 2.411481835;
@@ -59,8 +61,6 @@ public class Arm {
         }
     }
 
-    private double upperLimit = 1.7325637270000003;
-    private double lowerLimit = ArmStates.INSIDE;
 
     /**
      * Set the arm motors. Upper and lower limits are in place
@@ -74,10 +74,10 @@ public class Arm {
                     armA.setX(value, (byte) 2);   //Set armA to the argument, value
                     armB.setX(value, (byte) 2);  //Set armB to the argument, value, times -1
 
-                } else if(pot.getAverageVoltage() > upperLimit) {
+                } /*else if(pot.getAverageVoltage() > upperLimit) {
                     armA.setX(((value >= 0) ? value : 0 ) , (byte) 2); //Set arm motors to value only if it is negative
                     armB.setX(((value >= 0) ? value : 0 ), (byte) 2);
-                } else if(pot.getAverageVoltage() < lowerLimit) {
+                } */else if(pot.getAverageVoltage() < lowerLimit) {
                     armA.setX(((value <= 0) ? value : 0 ) , (byte) 2);   //Set arm motors to value only if it is positive
                     armB.setX(((value <= 0) ? value : 0 ), (byte) 2);
                 }
@@ -139,7 +139,7 @@ public class Arm {
         this.speedLimit = limit;
     }
     
-    public double setpoint = ArmStates.MID;
+    public double setpoint;// = ArmStates.MID;
     /**
      * Set the point for the arm
      * @param point the setpoint
@@ -208,6 +208,11 @@ public class Arm {
         } else if(!shift) {
             shifted = false;
         }
+    }
+
+    public void setElbow(boolean state) {
+        hingeA.set(state);
+        hingeB.set(!state);
     }
     
     public double getPosition() {

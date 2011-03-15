@@ -7,6 +7,7 @@ package org.team399.y2011.robot.autonomous;
 import org.team399.y2011.robot.JamesBot;
 import org.team399.y2011.robot.actuators.Arm;
 import org.team399.y2011.robot.sensors.LineSensorArray;
+import edu.wpi.first.wpilibj.DriverStation;
 
 
 /**
@@ -17,6 +18,7 @@ public class AutonomousRoutines {
 
     private static String kSide;
     private static LineSensorArray lsa = new LineSensorArray(1,2,3);
+    private static DriverStation ds = DriverStation.getInstance();
     
     /**
      * Set the side of the field
@@ -24,6 +26,71 @@ public class AutonomousRoutines {
      */
     public static void setSide(String side) {
         kSide = side;
+    }
+
+    private interface distances {
+        double toScoringDistance = 2188; //Currently an arbitrary number, change in testing
+        double toCenterLine = -1400;      //Also arbitrary
+    }
+    private interface speeds {
+        double driving = .5;
+        double approach = .3;
+    }
+
+    private static boolean stepOne = false, stepTwo = false, stepThree = false;
+
+    public static void oneTubeAuton() {
+        //JamesBot.arm.setPoint(Arm.ArmStates.HIGH);
+        //while(ds.isEnabled() && ds.isAutonomous()) {    //While in autonomous
+            //Drive to the scoring distance - 3 feet
+            double turnProp = .05;
+            JamesBot.robot.resetEncoder();
+            while(JamesBot.robot.getEncoderCounts() < distances.toScoringDistance && (ds.isEnabled() && ds.isAutonomous())) { //Change this value
+                //JamesBot.arm.update();
+                JamesBot.robot.arcadeDrive(speeds.driving, (turnProp)*-JamesBot.yaw.getAngle());
+            }
+            JamesBot.robot.resetEncoder();
+            JamesBot.roller.articulate(1);  //Spit tube
+        
+            while(JamesBot.robot.getEncoderCounts() > distances.toCenterLine && (ds.isEnabled() && ds.isAutonomous())) {
+                JamesBot.robot.arcadeDrive(-speeds.driving, (turnProp)*-JamesBot.yaw.getAngle());
+            }
+            JamesBot.robot.arcadeDrive(0,0);
+            
+        //}
+    }
+    public static void startTimer() {
+        startTime = System.currentTimeMillis();
+        JamesBot.arm.setElbow(true);
+        
+        JamesBot.arm.enable();
+        JamesBot.arm.setSpeedLimit(.5);
+    }
+    public static void dumbAuton() {
+        JamesBot.arm.setPoint(Arm.ArmStates.HIGH);
+        //JamesBot.arm.fold(true); no move to timer based
+        
+        JamesBot.arm.update();
+        if(System.currentTimeMillis() - startTime > 3100 && System.currentTimeMillis() - startTime < 9750) {
+            JamesBot.arm.setElbow(false);
+            JamesBot.arm.update();
+            JamesBot.robot.arcadeDrive(.5, 0);
+        }
+        if(System.currentTimeMillis() - startTime > 9750 && !(System.currentTimeMillis() - startTime > 11000)) {
+            JamesBot.robot.arcadeDrive(0, 0);
+            JamesBot.roller.grab(-.5);
+        }
+
+        if(System.currentTimeMillis() - startTime > 11000) {
+            JamesBot.robot.arcadeDrive(-.7, 0);
+        }
+    }
+
+    public static void hold() {
+        double turnProp = .2;
+        while(ds.isEnabled() && ds.isAutonomous()) {
+            JamesBot.robot.arcadeDrive(0, turnProp*-JamesBot.yaw.getAngle());
+        }
     }
     /**
      * Track Lines.
@@ -136,7 +203,7 @@ public class AutonomousRoutines {
          * Turn        Power        Angle        N/A          Timeout
          * Wait        Time(Millis) N/A          N/A          Timeout
          * Follow      Fork/StraightN/A          N/A          Timeout
-         * Arm_Set     Arm SetPoint N/A          N/A          Timeout
+         * Arm_Set     Armkickbutt SetPoint N/A          N/A          Timeout
          * End         N/A          N/A          N/A          Timeout
          */
 

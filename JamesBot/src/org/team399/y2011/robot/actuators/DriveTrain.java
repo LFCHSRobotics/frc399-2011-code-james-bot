@@ -26,7 +26,7 @@ public class DriveTrain {
     private Solenoid shiftA = new Solenoid(7);  //Shifter solenoids
     private Solenoid shiftB = new Solenoid(8);
 
-    private Encoder encoder  = new Encoder(10, 11);   //drive Encoders
+    private Encoder encoder  = new Encoder(8, 9 );   //drive Encoders
     //private Encoder rightEnc = new Encoder(6, 7);
     
     private Gyro yaw;   //Gyro
@@ -83,18 +83,31 @@ public class DriveTrain {
     }
     
     public void driveStraight(double counts, double throttle, double angle) {
-        //final double P = .5
-        //double error = angle - yaw.getAngle();
-        //double output = (P*angle);
-        //if(output > 1) {
-        //    output = 1;
-        //} else if(-output < -1) {
-        //    output = -1;
-        //}
-        if(getEncoderCounts() < counts) {
-            tankDrive(throttle/*-output*/, throttle/*+output*/);
+        final double P = .015; // the proportional scaler
+        double error = angle - yaw.getAngle();
+        double output = (P*error);
+        
+       System.out.println("Enc: " + getEncoderCounts());
+       System.out.println("Gyro:" + yaw.getAngle());
+
+        if(output > 1) {   //this limits our output to the motors to -1/1
+            output = 1;
+        } else if(-output < -1) {
+            output = -1;
+        }
+
+        if(getEncoderCounts() < counts) {   //this drives the robot and turns it based on the output
+            tankDrive(throttle-output, throttle);
         } else {
             tankDrive(0,0);
+        }
+    }
+
+    public void autoShift() {
+        if(getAverageCurrent() > 80) {
+            shift(true);
+        } else {
+            shift(true);
         }
     }
 
@@ -130,7 +143,7 @@ public class DriveTrain {
      */
     public void arcadeDrive(double throttle, double turn) {
         try {
-            tankDrive(throttle + turn, throttle - turn);
+            tankDrive(-throttle + turn, -(-throttle - turn));
         } catch(Throwable e) {
             new ExceptionHandler(e, "DriveTrain").print();
             try {
