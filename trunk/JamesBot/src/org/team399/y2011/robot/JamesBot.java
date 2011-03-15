@@ -38,12 +38,8 @@ public class JamesBot extends IterativeRobot {
     Rumblepad2GamePad operator = new Rumblepad2GamePad(3);//Operator gamepad
 
     DriverStationUserInterface io = new DriverStationUserInterface();
-
-    //public static LineSensorArray lsa = new LineSensorArray(1,2,3);
-
     
     DeploymentMechanism deploy = new DeploymentMechanism(3,4);  //Deployment mechanism instance
-    //PincherClaw claw           = new PincherClaw        (3,4);  //Pincher claw instance
     Flopper flopper            = new Flopper            (1,2);  //Flopper mechanism instance
     public static Arm arm      = new Arm                (5,6);  //Armkickbutt instance
     public static RollerClaw roller= new RollerClaw();
@@ -80,10 +76,6 @@ public class JamesBot extends IterativeRobot {
     public void disabledPeriodic() {
        arm.print();    //Print arm pot value
 
-       //arm.setPoint(arm.getPosition());
-       //System.out.println("Enc: " + robot.getEncoderCounts());
-       //System.out.println("Gyro:" + yaw.getAngle());
-
        if(io.getWhiteButton()) {
            autonomousMode = 1;
        } else if(io.getBlackButton()) {
@@ -93,7 +85,6 @@ public class JamesBot extends IterativeRobot {
        } else if(io.getBlueButton()) {
            autonomousMode = 4;
        }
-       //System.out.println("Autonomous Mode: " + autonomousMode);
     }
 
     public void teleopPeriodic() {
@@ -105,24 +96,11 @@ public class JamesBot extends IterativeRobot {
         }
         robot.shift(rightJoy.getTrigger() || leftJoy.getTrigger()); //Shift the drivetrain()
 
-        //claw.grab(operator.getButton(6));
-        
-        arm.enable();/*
-        if(operator.getButton(2)) {             //If the operator presses button 2,
-            arm.setPoint(Arm.ArmStates.LOW);    //Bring the arm into the low position
-        } else if(operator.getButton(3)) {      //Else if they press button 3,
-            arm.setPoint(Arm.ArmStates.MID);    //Bring the arm into the mid position
-        } else if(operator.getButton(4)) {      //else if they press button 4,
-            arm.setPoint(Arm.ArmStates.HIGH);   //Bring the arm into the high posision
-        } else if(operator.getButton(1)) {      //Else if they press button 1,
-            arm.setPoint(Arm.ArmStates.GROUND); //Bring it into the ground position
-        }*/
+        arm.enable();
         
         if(Math.abs(operator.getRightY()) > 0.1) {
             arm.setPoint(arm.getSetpoint() + (operator.getRightY()*.05));
         }
-        //arm.set(-operator.getRightY()*.5);
-        
 
         if(operator.getButton(6)) {
             roller.grab(1);                    // Grab tube
@@ -134,29 +112,17 @@ public class JamesBot extends IterativeRobot {
             roller.articulate(-.5);             // articulate tube down
         } else {
             roller.grab(operator.getLeftY());
-            //roller.articulate(operator.getLeftX());
+            
         }
-
-
-
 
         arm.fold(operator.getButton(10));
         flopper.flop(operator.getButton(9));
         deploy.deploy(operator.getButton(1) && operator.getButton(2) );
         arm.update();   //Update arm pid
+        
     }
     long starttime;
     public void autonomousInit() {
-        /*
-        //arm.fold(true); //commented out by john and brian to prevent folding in frame
-        compressor.start();
-        arm.fold(false);
-        arm.setSpeedLimit(.3);
-        arm.enable();
-        JamesBot.arm.setPoint(Arm.ArmStates.HIGH);
-        //AutonomousRoutines.autonOne();
-        AutonomousRoutines.setSide(autonomousSide);
-        starttime = System.currentTimeMillis();*/
         robot.resetEncoder();
         yaw.reset();
         robot.setGyro(yaw);
@@ -167,10 +133,6 @@ public class JamesBot extends IterativeRobot {
 
     public void autonomousPeriodic() {
         JamesBot.arm.setPoint(Arm.ArmStates.HIGH);
-       //System.out.println("Enc: " + robot.getEncoderCounts());
-       //System.out.println("Gyro:" + yaw.getAngle());
-       //AutonomousRoutines.oneTubeAuton();
-       //AutonomousRoutines.hold();
 
        switch(autonomousMode) {
            case 1:
@@ -180,7 +142,5 @@ public class JamesBot extends IterativeRobot {
            default:
                AutonomousRoutines.dumbAuton(); break;
        }
-       //AutonomousRoutines.dumbAuton();
-       //robot.tankDrive(-.5, .5);
     }
 }
