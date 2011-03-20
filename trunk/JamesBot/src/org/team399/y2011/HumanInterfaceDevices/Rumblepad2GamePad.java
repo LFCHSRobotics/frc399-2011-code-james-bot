@@ -60,4 +60,27 @@ public class Rumblepad2GamePad {
     public boolean getButton(int button) {
         return m_Pad.getRawButton(button);  //Return the state of the desired button
     }
+    
+    public boolean getDPad(int direction) {
+        switch(direction) {
+            case DPadStates.UP:
+                return (m_Pad.getRawAxis(6) < -.7);
+            case DPadStates.DOWN:
+                return (m_Pad.getRawAxis(6) > .7);
+            case DPadStates.LEFT:
+                return (m_Pad.getRawAxis(5) > .7);
+            case DPadStates.RIGHT:
+                return (m_Pad.getRawAxis(5) < -.7);
+            default:
+                return false;
+             
+        }
+    }
+
+    public static interface DPadStates {
+        final int UP = 0;
+        final int DOWN = 1;
+        final int LEFT = 2;
+        final int RIGHT = 3;
+    }
 }

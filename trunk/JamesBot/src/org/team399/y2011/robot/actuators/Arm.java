@@ -25,10 +25,11 @@ public class Arm {
      */
     public interface ArmStates {
         public static double HIGH   = lowerLimit - 0.6994913839999999;   //0.6994913839999999
-        public static double MID    = 2.2;
+        public static double MID    = 2.2;          //TODO: CHANGE VALUES
         public static double LOW    = 2.3;//2.14402;
         public static double GROUND = 2.411481835;
         public static double INSIDE = 2.504061577;
+        public static double TOMAHAWK_HIGH = HIGH;
     }
     
     private CANJaguar armA; //Instance of arm CAN Jaguar, A
@@ -139,7 +140,7 @@ public class Arm {
         this.speedLimit = limit;
     }
     
-    public double setpoint;// = ArmStates.MID;
+    private double setpoint;// = ArmStates.MID;
     /**
      * Set the point for the arm
      * @param point the setpoint

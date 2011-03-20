@@ -15,13 +15,14 @@ public class DriverStationUserInterface {
 
     private DriverStationEnhancedIO m_io;   //IO board object
 
-    final short BLUE_BUTTON     = 11;
-    final short RED_BUTTON      = 1;
-    final short WHITE_BUTTON    = 9;
-    final short BLACK_BUTTON    = 3;
-    final short TOGGLE_SWITCH   = 5;
-    final short MISSILE_SWITCH  = 4;
-    final short EASY_BUTTON     = 7;
+    final short BLUE_BUTTON        = 11;
+    final short RED_BUTTON         = 1;
+    final short WHITE_BUTTON       = 9;
+    final short BLACK_BUTTON       = 3;
+    final short TOGGLE_SWITCH_LEFT = 5;  //TODO: CHANGE
+    final short TOGGLE_SWITCH_RIGHT= 6;  //TODO: CHANGE
+    final short MISSILE_SWITCH     = 4;
+    final short EASY_BUTTON        = 7;
 
 
     /**
@@ -64,11 +65,19 @@ public class DriverStationUserInterface {
     }
 
     /**
-     * Get the state of the toggle switch
+     * Get the state of the left toggle switch
      * @return The toggle switch's state
      */
-    public boolean getToggleSwitch() {
-        return !getDigital(TOGGLE_SWITCH);
+    public boolean getLeftToggleSwitch() {
+        return !getDigital(TOGGLE_SWITCH_LEFT);
+    }
+
+    /**
+     * Get the state of the right toggle switch
+     * @return The toggle switch's state
+     */
+    public boolean getRightToggleSwitch() {
+        return !getDigital(TOGGLE_SWITCH_LEFT);
     }
 
     /**

@@ -62,16 +62,7 @@ public class JamesBot extends IterativeRobot {
     }
 
     long startTime;
-    public void teleopInit() {
-        arm.setPoint(Arm.ArmStates.HIGH);
-        compressor.start(); //Start compressor
-        arm.print();
-        arm.reset();
-        arm.update();
-        startTime = System.currentTimeMillis();
-        arm.setSpeedLimit(1);
-        robot.tankDrive(0,0);
-    }
+    
 
     public void disabledPeriodic() {
        arm.print();    //Print arm pot value
@@ -87,6 +78,17 @@ public class JamesBot extends IterativeRobot {
        }
     }
 
+    public void teleopInit() {
+        arm.setPoint(Arm.ArmStates.HIGH);
+        compressor.start(); //Start compressor
+        arm.print();
+        arm.reset();
+        arm.update();
+        startTime = System.currentTimeMillis();
+        arm.setSpeedLimit(1);
+        robot.tankDrive(0,0);
+    }
+
     public void teleopPeriodic() {
         if(!rightJoy.getButton(3)) {
             robot.tankDrive(leftJoy.getY(),
@@ -96,12 +98,74 @@ public class JamesBot extends IterativeRobot {
         }
         robot.shift(rightJoy.getTrigger() || leftJoy.getTrigger()); //Shift the drivetrain()
 
-        arm.enable();
-        
-        if(Math.abs(operator.getRightY()) > 0.1) {
-            arm.setPoint(arm.getSetpoint() + (operator.getRightY()*.05));
+    }
+
+    int currentPoint = 0;
+    boolean prevPad = false, currPad = false;;
+    public void operate() {
+        /**********************************************************************
+         * Setpoint cycling code
+         */
+        currPad = operator.getDPad(Rumblepad2GamePad.DPadStates.UP) ||
+                  operator.getDPad(Rumblepad2GamePad.DPadStates.DOWN);  //currPad is true if a button is pressed
+        if(operator.getDPad(Rumblepad2GamePad.DPadStates.UP) && currPad != prevPad) {
+            currentPoint++;
+            currentPoint = (currentPoint <= 0) ? 0 :
+                      ((currentPoint >= 5) ? 5 : currentPoint);
+            switch(currentPoint) {
+                case 0: arm.setPoint(Arm.ArmStates.INSIDE);        break;
+                case 1: arm.setPoint(Arm.ArmStates.GROUND);        break;
+                case 2: arm.setPoint(Arm.ArmStates.LOW);           break;
+                case 3: arm.setPoint(Arm.ArmStates.MID);           break;
+                case 4: arm.setPoint(Arm.ArmStates.HIGH);          break;
+                case 5: arm.setPoint(Arm.ArmStates.TOMAHAWK_HIGH); break;
+            }
+        } else if(operator.getDPad(Rumblepad2GamePad.DPadStates.DOWN) && currPad != prevPad)  {
+            currentPoint--;
+            currentPoint = (currentPoint <= 0) ? 0 :
+                      ((currentPoint >= 5) ? 5 : currentPoint);
+
+            switch(currentPoint) {
+                case 0: arm.setPoint(Arm.ArmStates.INSIDE);        break;
+                case 1: arm.setPoint(Arm.ArmStates.GROUND);        break;
+                case 2: arm.setPoint(Arm.ArmStates.LOW);           break;
+                case 3: arm.setPoint(Arm.ArmStates.MID);           break;
+                case 4: arm.setPoint(Arm.ArmStates.HIGH);          break;
+                case 5: arm.setPoint(Arm.ArmStates.TOMAHAWK_HIGH); break;
+            }
+        } else {
+            if(Math.abs(operator.getRightY()) > 0.1) {
+                arm.setPoint(arm.getSetpoint() + (operator.getRightY()*.05));
+            }
+            if(arm.getPosition() == Arm.ArmStates.GROUND) {    currentPoint = 1;}
+            else if(arm.getPosition() == Arm.ArmStates.LOW) { currentPoint = 2;}
+            else if(arm.getPosition() == Arm.ArmStates.MID) { currentPoint = 3;}
+            else if(arm.getPosition() == Arm.ArmStates.HIGH) { currentPoint = 4;}
         }
 
+        arm.enable();
+        arm.fold(operator.getButton(10));
+        arm.update();   //Update arm pid
+        prevPad = currPad;
+        /**********************************************************************
+         * End Cycling Code
+         */
+
+        /**********************************************************************
+         * Other operator controls
+         */
+
+        //Arm:
+        
+
+        //Endgame Stuff:
+        flopper.flop(operator.getButton(9) || io.getMissileSwitch());
+        deploy.deploy(operator.getButton(1) && operator.getButton(2) ||
+                ((io.getBlackButton() || io.getBlueButton() ||
+                  io.getRedButton() || io.getWhiteButton())) &&
+                  io.getMissileSwitch());
+
+        //Roller Claw Stuff:
         if(operator.getButton(6)) {
             roller.grab(1);                    // Grab tube
         } else if(operator.getButton(8)) {
@@ -112,15 +176,9 @@ public class JamesBot extends IterativeRobot {
             roller.articulate(-.5);             // articulate tube down
         } else {
             roller.grab(operator.getLeftY());
-            
         }
-
-        arm.fold(operator.getButton(10));
-        flopper.flop(operator.getButton(9));
-        deploy.deploy(operator.getButton(1) && operator.getButton(2) );
-        arm.update();   //Update arm pid
-        
     }
+
     long starttime;
     public void autonomousInit() {
         robot.resetEncoder();
