@@ -61,7 +61,7 @@ public class AutonomousRoutines {
     }
     public static void startTimer() {
         startTime = System.currentTimeMillis();
-        JamesBot.arm.setElbow(true);
+        JamesBot.arm.setElbow(true);    //Hold arm in
         
         JamesBot.arm.enable();
         JamesBot.arm.setSpeedLimit(.5);
@@ -82,7 +82,7 @@ public class AutonomousRoutines {
         }
 
         if(System.currentTimeMillis() - startTime > 11000) {
-            JamesBot.robot.arcadeDrive(-.7, 0);
+            JamesBot.robot.arcadeDrive(-.5, 0);
         }
     }
 
@@ -109,13 +109,6 @@ public class AutonomousRoutines {
                 //}
             }
             JamesBot.robot.tankDrive(0, 0);
-
-            
-            
-            //while(Math.abs(JamesBot.arm.getPosition() - JamesBot.arm.getSetpoint()) < .06) {
-                //JamesBot.arm.update();
-            //}
-
         }
     }
 
