@@ -108,31 +108,32 @@ public class JamesBot extends IterativeRobot {
          */
         currPad = operator.getDPad(Rumblepad2GamePad.DPadStates.UP) ||
                   operator.getDPad(Rumblepad2GamePad.DPadStates.DOWN);  //currPad is true if a button is pressed
+
         if(operator.getDPad(Rumblepad2GamePad.DPadStates.UP) && currPad != prevPad) {
             currentPoint++;
         } else if(operator.getDPad(Rumblepad2GamePad.DPadStates.DOWN) && currPad != prevPad)  {
             currentPoint--;
         } else {
             if(Math.abs(operator.getRightY()) > 0.1) {
-                arm.setPoint(arm.getSetpoint() + (operator.getRightY()*.05));
+                arm.setPoint(arm.getSetpoint() + (operator.getRightY()*.05));   //Arm Delta control
             }
-            if(arm.getPosition() == Arm.ArmStates.GROUND) {    currentPoint = 1;}
+            if(arm.getPosition() == Arm.ArmStates.GROUND) {    currentPoint = 1;}   //Sets currentPoint if the arm is moved manually
             else if(arm.getPosition() == Arm.ArmStates.LOW) { currentPoint = 2;}
             else if(arm.getPosition() == Arm.ArmStates.MID) { currentPoint = 3;}
             else if(arm.getPosition() == Arm.ArmStates.HIGH) { currentPoint = 4;}
         }
 
-        currentPoint = (currentPoint <= 0) ? 0 :
+        currentPoint = (currentPoint <= 0) ? 0 :                //Limit currentPoint fromm 0-5
                       ((currentPoint >= 5) ? 5 : currentPoint);
 
 
         switch(currentPoint) {
-            case 0: arm.setPoint(Arm.ArmStates.INSIDE);        break;
-            case 1: arm.setPoint(Arm.ArmStates.GROUND);        break;
-            case 2: arm.setPoint(Arm.ArmStates.LOW);           break;
-            case 3: arm.setPoint(Arm.ArmStates.MID);           break;
-            case 4: arm.setPoint(Arm.ArmStates.HIGH);          break;
-            case 5: arm.setPoint(Arm.ArmStates.TOMAHAWK_HIGH); break;
+            case 0: arm.setPoint(Arm.ArmStates.INSIDE);        break;   //Stowed setpoint
+            case 1: arm.setPoint(Arm.ArmStates.GROUND);        break;   //Ground pickup setpoint
+            case 2: arm.setPoint(Arm.ArmStates.LOW);           break;   //Low Peg Setpoint
+            case 3: arm.setPoint(Arm.ArmStates.MID);           break;   //Middle peg Setpoint
+            case 4: arm.setPoint(Arm.ArmStates.HIGH);          break;   //High peg setpoint
+            case 5: arm.setPoint(Arm.ArmStates.TOMAHAWK_HIGH); break;   //Tomohawk high peg setpoint
         }
         
         prevPad = currPad;
@@ -148,9 +149,9 @@ public class JamesBot extends IterativeRobot {
         
 
         //Endgame Stuff:
-        flopper.flop(operator.getButton(9) || io.getMissileSwitch());
-        deploy.deploy(operator.getButton(1) && operator.getButton(2) ||
-                ((io.getBlackButton() || io.getBlueButton() ||
+        flopper.flop(operator.getButton(9) || io.getMissileSwitch());   //Flop with either a gamepad button or the missile switch
+        deploy.deploy(operator.getButton(1) && operator.getButton(2) || //Deploy with either a gamepad button or
+                ((io.getBlackButton() || io.getBlueButton() ||          //The missile switch with any button on the button panel
                   io.getRedButton() || io.getWhiteButton())) &&
                   io.getMissileSwitch());
 
