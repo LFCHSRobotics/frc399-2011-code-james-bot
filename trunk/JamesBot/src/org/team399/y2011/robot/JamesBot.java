@@ -110,29 +110,8 @@ public class JamesBot extends IterativeRobot {
                   operator.getDPad(Rumblepad2GamePad.DPadStates.DOWN);  //currPad is true if a button is pressed
         if(operator.getDPad(Rumblepad2GamePad.DPadStates.UP) && currPad != prevPad) {
             currentPoint++;
-            currentPoint = (currentPoint <= 0) ? 0 :
-                      ((currentPoint >= 5) ? 5 : currentPoint);
-            switch(currentPoint) {
-                case 0: arm.setPoint(Arm.ArmStates.INSIDE);        break;
-                case 1: arm.setPoint(Arm.ArmStates.GROUND);        break;
-                case 2: arm.setPoint(Arm.ArmStates.LOW);           break;
-                case 3: arm.setPoint(Arm.ArmStates.MID);           break;
-                case 4: arm.setPoint(Arm.ArmStates.HIGH);          break;
-                case 5: arm.setPoint(Arm.ArmStates.TOMAHAWK_HIGH); break;
-            }
         } else if(operator.getDPad(Rumblepad2GamePad.DPadStates.DOWN) && currPad != prevPad)  {
             currentPoint--;
-            currentPoint = (currentPoint <= 0) ? 0 :
-                      ((currentPoint >= 5) ? 5 : currentPoint);
-
-            switch(currentPoint) {
-                case 0: arm.setPoint(Arm.ArmStates.INSIDE);        break;
-                case 1: arm.setPoint(Arm.ArmStates.GROUND);        break;
-                case 2: arm.setPoint(Arm.ArmStates.LOW);           break;
-                case 3: arm.setPoint(Arm.ArmStates.MID);           break;
-                case 4: arm.setPoint(Arm.ArmStates.HIGH);          break;
-                case 5: arm.setPoint(Arm.ArmStates.TOMAHAWK_HIGH); break;
-            }
         } else {
             if(Math.abs(operator.getRightY()) > 0.1) {
                 arm.setPoint(arm.getSetpoint() + (operator.getRightY()*.05));
@@ -143,9 +122,19 @@ public class JamesBot extends IterativeRobot {
             else if(arm.getPosition() == Arm.ArmStates.HIGH) { currentPoint = 4;}
         }
 
-        arm.enable();
-        arm.fold(operator.getButton(10));
-        arm.update();   //Update arm pid
+        currentPoint = (currentPoint <= 0) ? 0 :
+                      ((currentPoint >= 5) ? 5 : currentPoint);
+
+
+        switch(currentPoint) {
+            case 0: arm.setPoint(Arm.ArmStates.INSIDE);        break;
+            case 1: arm.setPoint(Arm.ArmStates.GROUND);        break;
+            case 2: arm.setPoint(Arm.ArmStates.LOW);           break;
+            case 3: arm.setPoint(Arm.ArmStates.MID);           break;
+            case 4: arm.setPoint(Arm.ArmStates.HIGH);          break;
+            case 5: arm.setPoint(Arm.ArmStates.TOMAHAWK_HIGH); break;
+        }
+        
         prevPad = currPad;
         /**********************************************************************
          * End Cycling Code
