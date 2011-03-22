@@ -24,12 +24,12 @@ public class Arm {
      * Arm state interface
      */
     public interface ArmStates {
-        public static double HIGH   = lowerLimit - 0.6994913839999999;   //0.6994913839999999
-        public static double MID    = 2.2;          //TODO: CHANGE VALUES
-        public static double LOW    = 2.3;//2.14402;
-        public static double GROUND = 2.411481835;
-        public static double INSIDE = 2.504061577;
-        public static double TOMAHAWK_HIGH = HIGH;
+        public static double HIGH          = lowerLimit - 0.6994913839999999;   //0.6994913839999999
+        public static double MID           = lowerLimit - 0.6994913839999999;;  //TODO: CHANGE VALUES
+        public static double LOW           = lowerLimit - 0.6994913839999999;;  //Currently, all setpoints are high
+        public static double GROUND        = lowerLimit - 0.6994913839999999;;
+        public static double INSIDE        = lowerLimit - 0.6994913839999999;;
+        public static double TOMAHAWK_HIGH = lowerLimit - 0.6994913839999999;;
     }
     
     private CANJaguar armA; //Instance of arm CAN Jaguar, A
@@ -69,27 +69,28 @@ public class Arm {
      */
     public void set(double value) {
         try {
-            if(/*getReedSwitch()*/ true) {
-                if(pot.getAverageVoltage() > upperLimit &&      //Upper and lower limit logic
-                        pot.getAverageVoltage() < lowerLimit) {
-                    armA.setX(value, (byte) 2);   //Set armA to the argument, value
-                    armB.setX(value, (byte) 2);  //Set armB to the argument, value, times -1
+            if(pot.getAverageVoltage() > upperLimit &&      //Upper and lower limit logic
+                    pot.getAverageVoltage() < lowerLimit) {
+                armA.setX(value, (byte) 2);   //Set armA to the argument, value
+                armB.setX(value, (byte) 2);  //Set armB to the argument, value, times -1
 
-                } /*else if(pot.getAverageVoltage() > upperLimit) {
-                    armA.setX(((value >= 0) ? value : 0 ) , (byte) 2); //Set arm motors to value only if it is negative
-                    armB.setX(((value >= 0) ? value : 0 ), (byte) 2);
-                } */else if(pot.getAverageVoltage() < lowerLimit) {
-                    armA.setX(((value <= 0) ? value : 0 ) , (byte) 2);   //Set arm motors to value only if it is positive
-                    armB.setX(((value <= 0) ? value : 0 ), (byte) 2);
-                }
-            } else {
-                //armA
+            } else if(pot.getAverageVoltage() > upperLimit) {
+                armA.setX(((value >= 0) ? value : 0 ) , (byte) 2); //Set arm motors to value only if it is negative
+                armB.setX(((value >= 0) ? value : 0 ), (byte) 2);
+            } else if(pot.getAverageVoltage() < lowerLimit) {
+                armA.setX(((value <= 0) ? value : 0 ) , (byte) 2);   //Set arm motors to value only if it is positive
+                armB.setX(((value <= 0) ? value : 0 ), (byte) 2);
             }
+
+            allowFolding = !(getSetpoint() > ArmStates.GROUND); //Automatic folding for the arm
+
             CANJaguar.updateSyncGroup((byte) 2);    //Update the Sync group
         } catch(Throwable e) {
             new ExceptionHandler(e, "Arm").print();
         }
     }
+
+    private boolean allowFolding = true;
 
     /**
      * Print the potentiometer value
@@ -201,14 +202,17 @@ public class Arm {
 
     boolean shifted = false, gear = false;
     public void fold(boolean shift) {
-        if(shift && !shifted) {
-            gear = !gear;
-            hingeA.set(gear);
-            hingeB.set(!gear);
-            shifted = true;
-        } else if(!shift) {
-            shifted = false;
-        }
+      if(allowFolding) {
+            if(shift && !shifted) {
+                gear = !gear;
+                setElbow(gear);
+                shifted = true;
+            } else if(!shift) {
+                shifted = false;
+            }
+      } else {
+          setElbow(true);
+      }
     }
 
     public void setElbow(boolean state) {

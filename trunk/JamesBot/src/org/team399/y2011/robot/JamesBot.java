@@ -15,8 +15,9 @@ import org.team399.y2011.HumanInterfaceDevices.Attack3Joystick;
 import org.team399.y2011.HumanInterfaceDevices.Rumblepad2GamePad;
 import edu.wpi.first.wpilibj.IterativeRobot;
 import edu.wpi.first.wpilibj.Compressor;
-import edu.wpi.first.wpilibj.Gyro;
 import org.team399.y2011.HumanInterfaceDevices.DriverStationUserInterface;
+import org.team399.y2011.Humans.Driver;
+import org.team399.y2011.Humans.Operator;
 import org.team399.y2011.robot.actuators.DeploymentMechanism;
 import org.team399.y2011.robot.actuators.Flopper;
 
@@ -32,7 +33,7 @@ public class JamesBot extends IterativeRobot {
 
     public static Attack3Joystick leftJoy       = new Attack3Joystick(1);           //Left Joystick
     public static Attack3Joystick rightJoy      = new Attack3Joystick(2);           //Right Joystick
-    public static Rumblepad2GamePad operator    = new Rumblepad2GamePad(3);         //Operator gamepad
+    public static Rumblepad2GamePad gamePad     = new Rumblepad2GamePad(3);         //Operator gamepad
     public static DriverStationUserInterface io = new DriverStationUserInterface(); //IO Board instance
 
     public static DriveTrain robot           = new DriveTrain         ();     //DriveTrain instance, contains drive code
@@ -42,14 +43,13 @@ public class JamesBot extends IterativeRobot {
     public static RollerClaw roller          = new RollerClaw         ();     //Instance of the roller claw
     public static Compressor compressor      = new Compressor         (14,1); //Compressor instance
 
-    //public static
+    private Driver   driver   = new Driver  ("Sam");    //Driver Instance
+    private Operator operator = new Operator("Jeremy"); //Operator instance
 
-    int autonomousMode = 0;
-    
+    public static int autonomousMode = 0;
     
     public void disabledInit() {
-        arm.disable();  //Disable arm PID control
-        
+        arm.disable();  //Disable arm PID control    
     }
 
     public void robotInit() {
@@ -57,7 +57,6 @@ public class JamesBot extends IterativeRobot {
     }
 
     long startTime;
-    
 
     public void disabledPeriodic() {
        arm.print();    //Print arm pot value
@@ -74,95 +73,18 @@ public class JamesBot extends IterativeRobot {
     }
 
     public void teleopInit() {
-        arm.setPoint(Arm.ArmStates.HIGH);
+        
         compressor.start(); //Start compressor
-        arm.print();
-        arm.reset();
-        arm.update();
         startTime = System.currentTimeMillis();
-        arm.setSpeedLimit(1);
-        robot.tankDrive(0,0);
+        operator.init(Arm.ArmStates.HIGH, 1);
+        driver.init();
     }
 
     public void teleopPeriodic() {
-        if(!rightJoy.getButton(3)) {
-            robot.tankDrive(leftJoy.getY(),
-                            -rightJoy.getY());   //Tank drive, two sticks
-        } else {
-            robot.arcadeDrive(leftJoy.getX(), rightJoy.getY()); //Arcade Drive
-        }
-        robot.shift(rightJoy.getTrigger() || leftJoy.getTrigger()); //Shift the drivetrain()
-
+        driver.drive();     //Driver stuff
+        operator.operate(); //Operater stuff
     }
 
-    int currentPoint = 0;
-    boolean prevPad = false, currPad = false;;
-    public void operate() {
-        /**********************************************************************
-         * Setpoint cycling code
-         */
-        currPad = operator.getDPad(Rumblepad2GamePad.DPadStates.UP) ||
-                  operator.getDPad(Rumblepad2GamePad.DPadStates.DOWN);  //currPad is true if a button is pressed
-
-        if(operator.getDPad(Rumblepad2GamePad.DPadStates.UP) && currPad != prevPad) {
-            currentPoint++;
-        } else if(operator.getDPad(Rumblepad2GamePad.DPadStates.DOWN) && currPad != prevPad)  {
-            currentPoint--;
-        } else {
-            if(Math.abs(operator.getRightY()) > 0.1) {
-                arm.setPoint(arm.getSetpoint() + (operator.getRightY()*.05));   //Arm Delta control
-            }
-            if(arm.getPosition() == Arm.ArmStates.GROUND) {    currentPoint = 1;}   //Sets currentPoint if the arm is moved manually
-            else if(arm.getPosition() == Arm.ArmStates.LOW) { currentPoint = 2;}
-            else if(arm.getPosition() == Arm.ArmStates.MID) { currentPoint = 3;}
-            else if(arm.getPosition() == Arm.ArmStates.HIGH) { currentPoint = 4;}
-        }
-
-        currentPoint = (currentPoint <= 0) ? 0 :                //Limit currentPoint fromm 0-5
-                      ((currentPoint >= 5) ? 5 : currentPoint);
-
-
-        switch(currentPoint) {
-            case 0: arm.setPoint(Arm.ArmStates.INSIDE);        break;   //Stowed setpoint
-            case 1: arm.setPoint(Arm.ArmStates.GROUND);        break;   //Ground pickup setpoint
-            case 2: arm.setPoint(Arm.ArmStates.LOW);           break;   //Low Peg Setpoint
-            case 3: arm.setPoint(Arm.ArmStates.MID);           break;   //Middle peg Setpoint
-            case 4: arm.setPoint(Arm.ArmStates.HIGH);          break;   //High peg setpoint
-            case 5: arm.setPoint(Arm.ArmStates.TOMAHAWK_HIGH); break;   //Tomohawk high peg setpoint
-        }
-        
-        prevPad = currPad;
-        /**********************************************************************
-         * End Cycling Code
-         */
-
-        /**********************************************************************
-         * Other operator controls
-         */
-
-        //Arm:
-        
-
-        //Endgame Stuff:
-        flopper.flop(operator.getButton(9) || io.getMissileSwitch());   //Flop with either a gamepad button or the missile switch
-        deploy.deploy(operator.getButton(1) && operator.getButton(2) || //Deploy with either a gamepad button or
-                ((io.getBlackButton() || io.getBlueButton() ||          //The missile switch with any button on the button panel
-                  io.getRedButton() || io.getWhiteButton())) &&
-                  io.getMissileSwitch());
-
-        //Roller Claw Stuff:
-        if(operator.getButton(6)) {
-            roller.grab(1);                    // Grab tube
-        } else if(operator.getButton(8)) {
-            roller.grab(-.5);                   // release tube
-        } else if(operator.getButton(7)) {
-            roller.articulate(.5);              // articulate tube up
-        } else if(operator.getButton(5)) {
-            roller.articulate(-.5);             // articulate tube down
-        } else {
-            roller.grab(operator.getLeftY());
-        }
-    }
 
     long starttime;
     public void autonomousInit() {
