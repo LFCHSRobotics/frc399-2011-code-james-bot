@@ -7,7 +7,6 @@
 
 package org.team399.y2011.robot;
 
-
 import org.team399.y2011.robot.actuators.DriveTrain;
 import org.team399.y2011.robot.actuators.Arm;
 import org.team399.y2011.robot.actuators.RollerClaw;
@@ -31,24 +30,22 @@ import org.team399.y2011.robot.actuators.Flopper;
  */
 public class JamesBot extends IterativeRobot {
 
-    public static DriveTrain robot = new DriveTrain();   //DriveTrain instance, contains drive code
-    
-    Attack3Joystick leftJoy  = new Attack3Joystick(1);    //Left Joystick
-    Attack3Joystick rightJoy = new Attack3Joystick(2);    //Right Joystick
-    Rumblepad2GamePad operator = new Rumblepad2GamePad(3);//Operator gamepad
+    public static Attack3Joystick leftJoy       = new Attack3Joystick(1);           //Left Joystick
+    public static Attack3Joystick rightJoy      = new Attack3Joystick(2);           //Right Joystick
+    public static Rumblepad2GamePad operator    = new Rumblepad2GamePad(3);         //Operator gamepad
+    public static DriverStationUserInterface io = new DriverStationUserInterface(); //IO Board instance
 
-    DriverStationUserInterface io = new DriverStationUserInterface();
-    
-    DeploymentMechanism deploy = new DeploymentMechanism(3,4);  //Deployment mechanism instance
-    Flopper flopper            = new Flopper            (1,2);  //Flopper mechanism instance
-    public static Arm arm      = new Arm                (5,6);  //Armkickbutt instance
-    public static RollerClaw roller= new RollerClaw();
+    public static DriveTrain robot           = new DriveTrain         ();     //DriveTrain instance, contains drive code
+    public static DeploymentMechanism deploy = new DeploymentMechanism(3,4);  //Deployment mechanism instance
+    public static Flopper flopper            = new Flopper            (1,2);  //Flopper mechanism instance
+    public static Arm arm                    = new Arm                (5,6);  //Arm instance
+    public static RollerClaw roller          = new RollerClaw         ();     //Instance of the roller claw
+    public static Compressor compressor      = new Compressor         (14,1); //Compressor instance
 
-    public static Gyro yaw = new Gyro(2);
-    Compressor compressor = new Compressor(14,1);   //Compressor instance
+    //public static
 
     int autonomousMode = 0;
-    String autonomousSide = "None";
+    
     
     public void disabledInit() {
         arm.disable();  //Disable arm PID control
@@ -56,9 +53,7 @@ public class JamesBot extends IterativeRobot {
     }
 
     public void robotInit() {
-        yaw.reset();
-        robot.stopEncoder();
-        robot.startEncoder();
+
     }
 
     long startTime;
@@ -171,24 +166,37 @@ public class JamesBot extends IterativeRobot {
 
     long starttime;
     public void autonomousInit() {
-        robot.resetEncoder();
-        yaw.reset();
-        robot.setGyro(yaw);
-        compressor.start(); //Start compressor
-        AutonomousRoutines.startTimer();
-        JamesBot.arm.setPoint(Arm.ArmStates.HIGH);
+        //All autonomous programs require resetting of encoder and gyro, so we will do that
+        robot.resetEncoder();           //Reset Encoder
+        robot.resetGyro();              //Reset Gyro
+        compressor.start();             //Start compressor
+        switch(autonomousMode) {
+            case 1: //Auton 1 requires some initialization, do it.
+                AutonomousRoutines.initDumbAuton(); break; //Init dumbAuton timers
+            case 2: //Auton 2 requires no initialization. at the moment.
+                break;
+            case 3: //Auton 3 does not exist, therefore we will not initialize it
+                break;
+            case 4: //Auton 4 does not exits, therefore we will not initialize it
+                break;
+            default: //By default(IO board broke, buttons broke, etc) do dumbAuton stuff
+                AutonomousRoutines.initDumbAuton(); break; //Init dumbAuton timers
+       }
     }
-
     public void autonomousPeriodic() {
-        JamesBot.arm.setPoint(Arm.ArmStates.HIGH);
-
-       switch(autonomousMode) {
-           case 1:
-               AutonomousRoutines.dumbAuton(); break;
-           case 2:
-               robot.driveStraight(2188*10, .6, 0); break;
-           default:
-               AutonomousRoutines.dumbAuton(); break;
+        switch(autonomousMode) {
+            case 1: //If you pressed the white button before the match, do the dead reckonining timer autonomous(DRTA)
+                //This autonomous uses no sensors and brought us to the finals in SD
+                AutonomousRoutines.dumbAuton(); break;
+            case 2: //If you pressed the black one, do the autonomous that does nothing but drive straight
+                //Note: This is not a real autonomous program. Just a test for gyros and encoders
+                robot.driveStraight(2188*10, .6, 0); break;
+            case 3:
+                break;
+            case 4:
+                break;
+            default: //Otherwise, do the DRTA
+                AutonomousRoutines.dumbAuton(); break;
        }
     }
 }
