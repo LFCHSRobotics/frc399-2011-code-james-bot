@@ -18,6 +18,7 @@ import org.team399.y2011.robot.utilities.Math;
  * @author Jeremy Germita and Gabe Ruiz
  */
 public class DriveTrain {
+
     private CANJaguar leftA;    //Left motor A
     private CANJaguar leftB;    //Left motor B
     private CANJaguar rightA;    //Right motor A
@@ -26,16 +27,15 @@ public class DriveTrain {
     private Solenoid shiftA = new Solenoid(7);  //Shifter solenoids
     private Solenoid shiftB = new Solenoid(8);
 
-    private Encoder encoder  = new Encoder(8, 9 );   //drive Encoders
-    //private Encoder rightEnc = new Encoder(6, 7);
-    
-    private Gyro yaw;   //Gyro
+    private Encoder encoder  = new Encoder(8, 9);   //drive Encoder
+    private Gyro yaw         = new Gyro(2);         //Gyro
 
     /**
      * Constructor
      */
     public DriveTrain() {
-        encoder.start();
+            encoder.start();
+            yaw.reset();
         try {
             leftA  = new CANJaguar(6);    //Left motor A
             leftB  = new CANJaguar(8);    //Left motor B
@@ -45,6 +45,7 @@ public class DriveTrain {
             leftB.configFaultTime(.5);
             rightA.configFaultTime(.5);
             rightB.configFaultTime(.5);
+
         } catch(Throwable e){
             new ExceptionHandler(e, "DriveTrain").print();
             System.out.println("ERROR INITIALIZING DRIVETRAIN");
@@ -58,6 +59,8 @@ public class DriveTrain {
             }
         }
     }
+
+
 
     /**
      * Reset the drivetrain encoder
@@ -80,6 +83,14 @@ public class DriveTrain {
 
     public void startEncoder() {
         encoder.start();
+    }
+
+    public void resetGyro() {
+        yaw.reset();
+    }
+
+    public double getAngle() {
+        return yaw.getAngle();
     }
     
     public void driveStraight(double counts, double throttle, double angle) {
