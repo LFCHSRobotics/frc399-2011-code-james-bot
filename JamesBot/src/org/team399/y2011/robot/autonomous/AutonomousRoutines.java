@@ -6,7 +6,6 @@
 package org.team399.y2011.robot.autonomous;
 import org.team399.y2011.robot.JamesBot;
 import org.team399.y2011.robot.actuators.Arm;
-import org.team399.y2011.robot.sensors.LineSensorArray;
 import edu.wpi.first.wpilibj.DriverStation;
 
 
@@ -17,12 +16,13 @@ import edu.wpi.first.wpilibj.DriverStation;
 public class AutonomousRoutines {
 
     private static String kSide;
-    private static LineSensorArray lsa = new LineSensorArray(1,2,3);
     private static DriverStation ds = DriverStation.getInstance();
     
     /**
      * Set the side of the field
+     * Depreciated due to abandonment of the line sensors
      * @param side The side
+     * @deprecated
      */
     public static void setSide(String side) {
         kSide = side;
