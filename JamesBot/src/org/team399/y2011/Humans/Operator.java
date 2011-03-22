@@ -44,37 +44,43 @@ public class Operator {
         /**********************************************************************
          * Arm stuff
          */
-        currPad = JamesBot.gamePad.getDPad(Rumblepad2GamePad.DPadStates.UP) ||
-                  JamesBot.gamePad.getDPad(Rumblepad2GamePad.DPadStates.DOWN);  //currPad is true if a button is pressed
+        if(!JamesBot.io.getLeftToggleSwitch()) {
+            JamesBot.arm.enable();
+            currPad = JamesBot.gamePad.getDPad(Rumblepad2GamePad.DPadStates.UP) ||
+                      JamesBot.gamePad.getDPad(Rumblepad2GamePad.DPadStates.DOWN);  //currPad is true if a button is pressed
 
-        if(JamesBot.gamePad.getDPad(Rumblepad2GamePad.DPadStates.UP) && currPad != prevPad) {
-            currentPoint++;
-        } else if(JamesBot.gamePad.getDPad(Rumblepad2GamePad.DPadStates.DOWN) && currPad != prevPad)  {
-            currentPoint--;
-        } else {
-            if(Math.abs(JamesBot.gamePad.getRightY()) > 0.1) {
-                JamesBot.arm.setPoint(JamesBot.arm.getSetpoint() + (JamesBot.gamePad.getRightY()*.05));   //Arm Delta control
+            if(JamesBot.gamePad.getDPad(Rumblepad2GamePad.DPadStates.UP) && currPad != prevPad) {
+                currentPoint++;
+            } else if(JamesBot.gamePad.getDPad(Rumblepad2GamePad.DPadStates.DOWN) && currPad != prevPad)  {
+                currentPoint--;
+            } else {
+                if(Math.abs(JamesBot.gamePad.getRightY()) > 0.1) {
+                    JamesBot.arm.setPoint(JamesBot.arm.getSetpoint() + (JamesBot.gamePad.getRightY()*.05));   //Arm Delta control
+                }
+                if(JamesBot.arm.getPosition() == Arm.ArmStates.GROUND) {    currentPoint = 1;}   //Sets currentPoint if the arm is moved manually
+                else if(JamesBot.arm.getPosition() == Arm.ArmStates.LOW) { currentPoint = 2;}
+                else if(JamesBot.arm.getPosition() == Arm.ArmStates.MID) { currentPoint = 3;}
+                else if(JamesBot.arm.getPosition() == Arm.ArmStates.HIGH) { currentPoint = 4;}
             }
-            if(JamesBot.arm.getPosition() == Arm.ArmStates.GROUND) {    currentPoint = 1;}   //Sets currentPoint if the arm is moved manually
-            else if(JamesBot.arm.getPosition() == Arm.ArmStates.LOW) { currentPoint = 2;}
-            else if(JamesBot.arm.getPosition() == Arm.ArmStates.MID) { currentPoint = 3;}
-            else if(JamesBot.arm.getPosition() == Arm.ArmStates.HIGH) { currentPoint = 4;}
+
+            JamesBot.arm.fold(JamesBot.gamePad.getButton(10));
+
+            currentPoint = (currentPoint <= 0) ? 0 :                //Limit currentPoint from 0-5
+                          ((currentPoint >= 5) ? 5 : currentPoint); //Nested ternary operators FTW
+
+            switch(currentPoint) {
+                case 0: JamesBot.arm.setPoint(Arm.ArmStates.INSIDE);        break;   //Stowed setpoint
+                case 1: JamesBot.arm.setPoint(Arm.ArmStates.GROUND);        break;   //Ground pickup setpoint
+                case 2: JamesBot.arm.setPoint(Arm.ArmStates.LOW);           break;   //Low Peg Setpoint
+                case 3: JamesBot.arm.setPoint(Arm.ArmStates.MID);           break;   //Middle peg Setpoint
+                case 4: JamesBot.arm.setPoint(Arm.ArmStates.HIGH);          break;   //High peg setpoint
+                case 5: JamesBot.arm.setPoint(Arm.ArmStates.TOMAHAWK_HIGH); break;   //Tomahawk high peg setpoint
+            }
+
+            prevPad = currPad;
+        } else {
+            JamesBot.arm.safeMode(JamesBot.gamePad.getRightY(), false);
         }
-
-        currentPoint = (currentPoint <= 0) ? 0 :                //Limit currentPoint from 0-5
-                      ((currentPoint >= 5) ? 5 : currentPoint); //Nested ternary operators FTW
-
-
-        switch(currentPoint) {
-            case 0: JamesBot.arm.setPoint(Arm.ArmStates.INSIDE);        break;   //Stowed setpoint
-            case 1: JamesBot.arm.setPoint(Arm.ArmStates.GROUND);        break;   //Ground pickup setpoint
-            case 2: JamesBot.arm.setPoint(Arm.ArmStates.LOW);           break;   //Low Peg Setpoint
-            case 3: JamesBot.arm.setPoint(Arm.ArmStates.MID);           break;   //Middle peg Setpoint
-            case 4: JamesBot.arm.setPoint(Arm.ArmStates.HIGH);          break;   //High peg setpoint
-            case 5: JamesBot.arm.setPoint(Arm.ArmStates.TOMAHAWK_HIGH); break;   //Tomahawk high peg setpoint
-        }
-
-        prevPad = currPad;
         /**********************************************************************
          * End Arm Code
          */

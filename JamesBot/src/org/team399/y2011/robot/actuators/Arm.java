@@ -20,26 +20,29 @@ public class Arm {
     private static double upperLimit = lowerLimit - 1.1778200509999999; //1.4599678200000001;
     //TODO:  EDIT ArmState INTERFACE VALUES FOR PID SETPOINTS
     //TODO:  FOR SETPOINTS, USE A RELATIVE SYSTEM. START ARM IN "DOWN" POSITION, EACH SETPOINT IS X FROM DOWN
-    /**
-     * Arm state interface
-     */
-    public interface ArmStates {
-        public static double HIGH          = lowerLimit - 0.6994913839999999;   //0.6994913839999999
-        public static double MID           = lowerLimit - 0.6994913839999999;;  //TODO: CHANGE VALUES
-        public static double LOW           = lowerLimit - 0.6994913839999999;;  //Currently, all setpoints are high
-        public static double GROUND        = lowerLimit - 0.6994913839999999;;
-        public static double INSIDE        = lowerLimit - 0.6994913839999999;;
-        public static double TOMAHAWK_HIGH = lowerLimit - 0.6994913839999999;;
-    }
+    
     
     private CANJaguar armA; //Instance of arm CAN Jaguar, A
     private CANJaguar armB; //Instance of arm CAN Jaguar, B
 
-    private Solenoid hingeA;
+    private Solenoid hingeA;    //The arm hinge solenoids
     private Solenoid hingeB;
 
-    private AnalogChannel pot;  //Instance of the potentiometer
-    private DigitalInput reedSwitch;
+    private AnalogChannel pot;          //Instance of the potentiometer
+    private DigitalInput reedSwitch;    //Instance of the magnet switch
+
+    private boolean allowFolding = true;    //Enables/Disables folding control. Used for automatic folding
+
+    //PID Variables:************************************************************
+    private double processValue;                   //The potentiometer input
+    private final double P = 3, I = 0.0001, D = 0; //P, I, and D values
+    private double error, prevError, output, integral, derivative; //Other values needed by PID
+    private boolean enabled = true;                //Enables/Disables closed loop PID
+    private double speedLimit = 1;                 //Speed limit for arm. Defaults to 1(full power)
+    private double setpoint;                       //The current setpoint for the arm
+
+    boolean shifted = false, gear = false;         //For the folding solenoid
+    boolean enableSoftLimits = true;               //Enables/disables software limits
 
     /**
      * Constructor
@@ -62,6 +65,17 @@ public class Arm {
         }
     }
 
+    /**
+     * Arm state interface
+     */
+    public interface ArmStates {
+        public static double HIGH          = lowerLimit - 0.6994913839999999;   //0.6994913839999999
+        public static double MID           = lowerLimit - 0.6994913839999999;;  //TODO: CHANGE VALUES
+        public static double LOW           = lowerLimit - 0.6994913839999999;;  //Currently, all setpoints are high
+        public static double GROUND        = lowerLimit - 0.6994913839999999;;
+        public static double INSIDE        = lowerLimit - 0.6994913839999999;;
+        public static double TOMAHAWK_HIGH = lowerLimit - 0.6994913839999999;;
+    }
 
     /**
      * Set the arm motors. Upper and lower limits are in place
@@ -70,14 +84,14 @@ public class Arm {
     public void set(double value) {
         try {
             if(pot.getAverageVoltage() > upperLimit &&      //Upper and lower limit logic
-                    pot.getAverageVoltage() < lowerLimit) {
+                    pot.getAverageVoltage() < lowerLimit && enableSoftLimits) {
                 armA.setX(value, (byte) 2);   //Set armA to the argument, value
                 armB.setX(value, (byte) 2);  //Set armB to the argument, value, times -1
 
-            } else if(pot.getAverageVoltage() > upperLimit) {
+            } else if(pot.getAverageVoltage() > upperLimit && enableSoftLimits) {
                 armA.setX(((value >= 0) ? value : 0 ) , (byte) 2); //Set arm motors to value only if it is negative
                 armB.setX(((value >= 0) ? value : 0 ), (byte) 2);
-            } else if(pot.getAverageVoltage() < lowerLimit) {
+            } else if(pot.getAverageVoltage() < lowerLimit && enableSoftLimits) {
                 armA.setX(((value <= 0) ? value : 0 ) , (byte) 2);   //Set arm motors to value only if it is positive
                 armB.setX(((value <= 0) ? value : 0 ), (byte) 2);
             }
@@ -90,8 +104,6 @@ public class Arm {
         }
     }
 
-    private boolean allowFolding = true;
-
     /**
      * Print the potentiometer value
      */
@@ -103,11 +115,6 @@ public class Arm {
     public boolean getReedSwitch() {
         return !reedSwitch.get();
     }
-
-    private double processValue;    //The potentiometer input
-    private final double P = 3, I = 0.0001, D = 0; //P, I, and D values
-    private double error, prevError, output, integral, derivative; //Other values needed by PID
-    private boolean enabled = true;
 
     /**
      * Update pid
@@ -135,13 +142,15 @@ public class Arm {
             }
         }
     }
-    private double speedLimit = 1;
 
+    /**
+     * Set the maximum speed for the arm.
+     * @param limit speed limit. from 0-1
+     */
     public void setSpeedLimit(double limit) {
         this.speedLimit = limit;
     }
     
-    private double setpoint;// = ArmStates.MID;
     /**
      * Set the point for the arm
      * @param point the setpoint
@@ -173,6 +182,9 @@ public class Arm {
         set(0.0);
     }
 
+    /**
+     * Disables, then re-enables the PID controller
+     */
     public void reset() {
         disable();
         enable();
@@ -199,8 +211,10 @@ public class Arm {
         }
     }
 
-
-    boolean shifted = false, gear = false;
+    /**
+     * Folds the arm. Operator-friendly toggle version
+     * @param shift A button input to fold the arm. Goes true to toggle the arm state
+     */
     public void fold(boolean shift) {
       if(allowFolding) {
             if(shift && !shifted) {
@@ -215,12 +229,31 @@ public class Arm {
       }
     }
 
+    /**
+     * Folds the arm. Autonomous-friendly raw version
+     * @param state The state to set the folding solenoids. True == folded, False == extended
+     */
     public void setElbow(boolean state) {
         hingeA.set(state);
         hingeB.set(!state);
     }
-    
+
+    /**
+     * Get the position from the potentiometer
+     * @return The potentiometer's value
+     */
     public double getPosition() {
         return pot.getAverageValue();
+    }
+
+    /**
+     * Put the arm into safeMode
+     * @param armSpeed Raw speed to send the arm
+     * @param limits
+     */
+    public void safeMode(double armSpeed, boolean limits) {
+        disable();                  //Disables PID
+        set(armSpeed);              //Sets the arm speed to the the argument
+        enableSoftLimits = limits;  //Enable/Disable software limits
     }
 }
