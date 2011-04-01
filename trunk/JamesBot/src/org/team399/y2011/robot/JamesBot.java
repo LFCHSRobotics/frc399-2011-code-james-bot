@@ -20,7 +20,7 @@ import org.team399.y2011.Humans.Driver;
 import org.team399.y2011.Humans.Operator;
 import org.team399.y2011.robot.actuators.DeploymentMechanism;
 import org.team399.y2011.robot.actuators.Flopper;
-
+import org.team399.y2011.communications.Driverstation;
 
 /**
  * The VM is configured to automatically run this class, and to call the
@@ -35,6 +35,7 @@ public class JamesBot extends IterativeRobot {
     public static Attack3Joystick rightJoy      = new Attack3Joystick(2);           //Right Joystick
     public static Rumblepad2GamePad gamePad     = new Rumblepad2GamePad(3);         //Operator gamepad
     public static DriverStationUserInterface io = new DriverStationUserInterface(); //IO Board instance
+    public static Driverstation db              = new Driverstation();
 
     public static DriveTrain robot           = new DriveTrain         ();     //DriveTrain instance, contains drive code
     public static DeploymentMechanism deploy = new DeploymentMechanism(3,4);  //Deployment mechanism instance
@@ -60,8 +61,13 @@ public class JamesBot extends IterativeRobot {
 
     public void disabledPeriodic() {
        arm.print();    //Print arm pot value
+       db.sendDouble(arm.getPosition());
+       db.sendDouble(arm.getSetpoint());
+       db.commit();
 
-       if(io.getWhiteButton()) {
+       if(io.getRightToggleSwitch()) {
+           autonomousMode = 0;
+       } else if(io.getWhiteButton()) {
            autonomousMode = 1;
        } else if(io.getBlackButton()) {
            autonomousMode = 2;
@@ -76,12 +82,13 @@ public class JamesBot extends IterativeRobot {
         
         compressor.start(); //Start compressor
         startTime = System.currentTimeMillis();
-        operator.init(Arm.ArmStates.HIGH, 1);
+        operator.init(Arm.ArmStates.GROUND, 1);
         driver.init();
     }
 
     public void teleopPeriodic() {
         driver.drive();     //Driver stuff
+        arm.print();    //Print arm pot value
         operator.operate(); //Operater stuff
     }
 

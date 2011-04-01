@@ -4,7 +4,6 @@
  */
 
 package org.team399.y2011.robot.actuators;
-
 import edu.wpi.first.wpilibj.AnalogChannel;
 import edu.wpi.first.wpilibj.CANJaguar;
 import edu.wpi.first.wpilibj.Solenoid;
@@ -16,8 +15,8 @@ import org.team399.y2011.robot.utilities.ExceptionHandler;
  * @author Jeremy Germita
  */
 public class Arm {
-    private static double lowerLimit = 2.40576524;
-    private static double upperLimit = lowerLimit - 1.1778200509999999; //1.4599678200000001;
+    private static double lowerLimit = 1.7377070460000001;
+    private static double upperLimit = lowerLimit - 1.2; //1.4599678200000001;
     //TODO:  EDIT ArmState INTERFACE VALUES FOR PID SETPOINTS
     //TODO:  FOR SETPOINTS, USE A RELATIVE SYSTEM. START ARM IN "DOWN" POSITION, EACH SETPOINT IS X FROM DOWN
     
@@ -35,7 +34,7 @@ public class Arm {
 
     //PID Variables:************************************************************
     private double processValue;                   //The potentiometer input
-    private final double P = 3, I = 0.0001, D = 0; //P, I, and D values
+    private final double P = 9, I = .01, D = 0; //P, I, and D values
     private double error, prevError, output, integral, derivative; //Other values needed by PID
     private boolean enabled = true;                //Enables/Disables closed loop PID
     private double speedLimit = 1;                 //Speed limit for arm. Defaults to 1(full power)
@@ -69,12 +68,13 @@ public class Arm {
      * Arm state interface
      */
     public interface ArmStates {
-        public static double HIGH          = lowerLimit - 0.6994913839999999;   //0.6994913839999999
-        public static double MID           = lowerLimit - 0.6994913839999999;;  //TODO: CHANGE VALUES
-        public static double LOW           = lowerLimit - 0.6994913839999999;;  //Currently, all setpoints are high
-        public static double GROUND        = lowerLimit - 0.6994913839999999;;
-        public static double INSIDE        = lowerLimit - 0.6994913839999999;;
-        public static double TOMAHAWK_HIGH = lowerLimit - 0.6994913839999999;;
+        //Lower limit is 3.867041112
+        public static double HIGH          = lowerLimit - 0.6320549609999998;   //3.203552961
+        public static double MID           = lowerLimit - 0.452612072;  //3.41442904
+        public static double LOW           = lowerLimit - 0.344602373;  //3.522438739
+        public static double GROUND        = lowerLimit - 0.1028663799999997;  //3.7641747320000003
+        public static double INSIDE        = lowerLimit;
+        public static double TOMAHAWK_HIGH = lowerLimit - 0.684913839999999;
     }
 
     /**
@@ -83,16 +83,16 @@ public class Arm {
      */
     public void set(double value) {
         try {
-            if(pot.getAverageVoltage() > upperLimit &&      //Upper and lower limit logic
+            if(/*pot.getAverageVoltage() > upperLimit &&*/      //Upper and lower limit logic
                     pot.getAverageVoltage() < lowerLimit && enableSoftLimits) {
-                armA.setX(value, (byte) 2);   //Set armA to the argument, value
+                armA.setX(-value, (byte) 2);   //Set armA to the argument, value
                 armB.setX(value, (byte) 2);  //Set armB to the argument, value, times -1
 
             } else if(pot.getAverageVoltage() > upperLimit && enableSoftLimits) {
-                armA.setX(((value >= 0) ? value : 0 ) , (byte) 2); //Set arm motors to value only if it is negative
-                armB.setX(((value >= 0) ? value : 0 ), (byte) 2);
+                armA.setX(-value , (byte) 2); //Set arm motors to value only if it is negative
+                armB.setX(value, (byte) 2);
             } else if(pot.getAverageVoltage() < lowerLimit && enableSoftLimits) {
-                armA.setX(((value <= 0) ? value : 0 ) , (byte) 2);   //Set arm motors to value only if it is positive
+                armA.setX(-((value <= 0) ? value : 0 ) , (byte) 2);   //Set arm motors to value only if it is positive
                 armB.setX(((value <= 0) ? value : 0 ), (byte) 2);
             }
 
@@ -109,7 +109,9 @@ public class Arm {
      */
     public void print() {
         System.out.println("Potentiometer Value: " + pot.getAverageVoltage());
-        System.out.println("Setpoint: " + setpoint);
+        //System.out.println("Setpoint: " + setpoint);
+        /*try { System.out.println("Speed: " + armA.getX()); }
+        catch (Exception e){  }*/
     }
 
     public boolean getReedSwitch() {
@@ -156,9 +158,9 @@ public class Arm {
      * @param point the setpoint
      */
     public void setPoint(double point) {
-      if(point <= upperLimit) {
+      /*if(point <= upperLimit) {
         setpoint = upperLimit;
-      } else if(point >= lowerLimit) {
+      } else */if(point >= lowerLimit) {
         setpoint = lowerLimit;
       } else {
         setpoint = point;
@@ -216,7 +218,7 @@ public class Arm {
      * @param shift A button input to fold the arm. Goes true to toggle the arm state
      */
     public void fold(boolean shift) {
-      if(allowFolding) {
+      //if(allowFolding) {
             if(shift && !shifted) {
                 gear = !gear;
                 setElbow(gear);
@@ -224,9 +226,9 @@ public class Arm {
             } else if(!shift) {
                 shifted = false;
             }
-      } else {
-          setElbow(true);
-      }
+      //} //else {
+          //setElbow(true);
+      //}
     }
 
     /**
