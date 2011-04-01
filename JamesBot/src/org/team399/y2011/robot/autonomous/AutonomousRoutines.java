@@ -71,7 +71,7 @@ public class AutonomousRoutines {
         startTime = System.currentTimeMillis();
         JamesBot.arm.setElbow(true);    //Hold arm in
         JamesBot.arm.enable();          //Enable closed loop control on arm
-        JamesBot.arm.setSpeedLimit(.5); //Halve the speed limit on the arm
+        JamesBot.arm.setSpeedLimit(.7); //Halve the speed limit on the arm
     }
 
     /**
@@ -85,7 +85,6 @@ public class AutonomousRoutines {
         JamesBot.arm.update();
         if(System.currentTimeMillis() - startTime > 3100 && System.currentTimeMillis() - startTime < 9750) {
             JamesBot.arm.setElbow(false);
-            JamesBot.arm.update();
             JamesBot.robot.arcadeDrive(.5, 0);
         }
         if(System.currentTimeMillis() - startTime > 9750 && !(System.currentTimeMillis() - startTime > 11000)) {
@@ -96,6 +95,7 @@ public class AutonomousRoutines {
         if(System.currentTimeMillis() - startTime > 11000) {
             JamesBot.robot.arcadeDrive(-.5, 0);
         }
+
     }
 
     /**

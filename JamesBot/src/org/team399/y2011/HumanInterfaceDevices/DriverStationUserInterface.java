@@ -19,15 +19,16 @@ public class DriverStationUserInterface {
     final short RED_BUTTON         = 1;
     final short WHITE_BUTTON       = 9;
     final short BLACK_BUTTON       = 3;
-    final short TOGGLE_SWITCH_LEFT = 5;  //TODO: CHANGE
-    final short TOGGLE_SWITCH_RIGHT= 6;  //TODO: CHANGE
-    final short MISSILE_SWITCH     = 4;
+    final short TOGGLE_SWITCH_LEFT = 12;
+    final short TOGGLE_SWITCH_RIGHT= 6;
+    final short MISSILE_SWITCH     = 2;
     final short EASY_BUTTON        = 7;
 
 
     /**
      * Constructor.
      */
+
     public DriverStationUserInterface() {
         m_io = DriverStation.getInstance().getEnhancedIO(); //Instantiating the object
     }
@@ -77,7 +78,7 @@ public class DriverStationUserInterface {
      * @return The toggle switch's state
      */
     public boolean getRightToggleSwitch() {
-        return !getDigital(TOGGLE_SWITCH_LEFT);
+        return getDigital(TOGGLE_SWITCH_RIGHT);
     }
 
     /**

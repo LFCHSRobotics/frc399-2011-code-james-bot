@@ -34,8 +34,15 @@ public class Driverstation {
     public void writeLCD(int line, String text) {
         //TODO: EDIT THIS METHOD
         switch(line) {
-            case 1:
-                m_lcd.println(DriverStationLCD.Line.kMain6, line, text);
+            case 1: m_lcd.println(DriverStationLCD.Line.kMain6, line, text); break;
         }
+    }
+
+    public void sendDouble(double data) {
+        m_dashLow.addDouble(data);
+    }
+
+    public void commit() {
+        m_dashLow.commit();
     }
 }
