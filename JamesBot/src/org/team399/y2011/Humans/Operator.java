@@ -126,6 +126,7 @@ public class Operator {
          */
 
         //Endgame Stuff:
+
         JamesBot.flopper.flop(JamesBot.gamePad.getButton(9) || JamesBot.io.getMissileSwitch());   //Flop with either a gamepad button or the missile switch
         JamesBot.deploy.deploy(JamesBot.gamePad.getButton(1) && JamesBot.gamePad.getButton(2) || //Deploy with either a gamepad button or
                 ((JamesBot.io.getBlackButton() || JamesBot.io.getBlueButton() ||          //The missile switch with any button on the button panel

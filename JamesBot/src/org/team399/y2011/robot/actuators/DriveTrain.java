@@ -114,6 +114,24 @@ public class DriveTrain {
         }
     }
 
+    public void driveStraight(double throttle, double angle) {
+        final double P = .125; // the proportional scaler
+        double error = angle - yaw.getAngle();
+        double outputRight = throttle - (P*error);
+
+       //System.out.println("Enc: " + getEncoderCounts());
+       System.out.println("Gyro:" + yaw.getAngle());
+
+        if(outputRight > 1) {   //this limits our output to the motors to -1/1
+            outputRight = 1;
+        } else if(-outputRight < -1) {
+            outputRight = -1;
+        }
+       System.out.println("Output: " + outputRight);
+
+        tankDrive(-throttle, outputRight);
+    }
+
     public void autoShift() {
         if(getAverageCurrent() > 80) {
             shift(true);
