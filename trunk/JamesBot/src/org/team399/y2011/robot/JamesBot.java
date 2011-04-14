@@ -60,14 +60,20 @@ public class JamesBot extends IterativeRobot {
     long startTime;
 
     public void disabledPeriodic() {
-       arm.print();    //Print arm pot value
-       db.sendDouble(arm.getPosition());
-       db.sendDouble(arm.getSetpoint());
-       db.commit();
+       //arm.print();    //Print arm pot value
+       //db.sendDouble(arm.getPosition());
+       //db.sendDouble(arm.getSetpoint());
+       //db.commit();
 
-       if(io.getRightToggleSwitch()) {
+       /*if(io.getRightToggleSwitch()) {
            autonomousMode = 0;
-       } else if(io.getWhiteButton()) {
+       } else*/
+       
+       
+       
+       //robot.driveStraight(0, 0);
+       
+       /*if(io.getWhiteButton()) {
            autonomousMode = 1;
        } else if(io.getBlackButton()) {
            autonomousMode = 2;
@@ -75,7 +81,9 @@ public class JamesBot extends IterativeRobot {
            autonomousMode = 3;
        } else if(io.getBlueButton()) {
            autonomousMode = 4;
-       }
+       }*/
+
+       autonomousMode = 2;
     }
 
     public void teleopInit() {
@@ -103,6 +111,7 @@ public class JamesBot extends IterativeRobot {
             case 1: //Auton 1 requires some initialization, do it.
                 AutonomousRoutines.initDumbAuton(); break; //Init dumbAuton timers
             case 2: //Auton 2 requires no initialization. at the moment.
+                AutonomousRoutines.initCompetentAuton();
                 break;
             case 3: //Auton 3 does not exist, therefore we will not initialize it
                 break;
@@ -119,13 +128,14 @@ public class JamesBot extends IterativeRobot {
                 AutonomousRoutines.dumbAuton(); break;
             case 2: //If you pressed the black one, do the autonomous that does nothing but drive straight
                 //Note: This is not a real autonomous program. Just a test for gyros and encoders
-                robot.driveStraight(2188*10, .6, 0); break;
+                AutonomousRoutines.competentAuton();
             case 3:
                 break;
             case 4:
                 break;
             default: //Otherwise, do the DRTA
                 AutonomousRoutines.dumbAuton(); break;
+                //robot.driveStraight(.5, 0); break;
        }
     }
 }

@@ -69,7 +69,7 @@ public class AutonomousRoutines {
      */
     public static void initDumbAuton() {
         startTime = System.currentTimeMillis();
-        JamesBot.arm.setElbow(true);    //Hold arm in
+        JamesBot.arm.setElbow(false);    //Hold arm in
         JamesBot.arm.enable();          //Enable closed loop control on arm
         JamesBot.arm.setSpeedLimit(.7); //Halve the speed limit on the arm
     }
@@ -84,7 +84,7 @@ public class AutonomousRoutines {
         
         JamesBot.arm.update();
         if(System.currentTimeMillis() - startTime > 3100 && System.currentTimeMillis() - startTime < 9750) {
-            JamesBot.arm.setElbow(false);
+            
             JamesBot.robot.arcadeDrive(.5, 0);
         }
         if(System.currentTimeMillis() - startTime > 9750 && !(System.currentTimeMillis() - startTime > 11000)) {
@@ -94,6 +94,53 @@ public class AutonomousRoutines {
 
         if(System.currentTimeMillis() - startTime > 11000) {
             JamesBot.robot.arcadeDrive(-.5, 0);
+        }
+
+    }
+    
+    public static void initCompetentAuton() {
+        startTime = System.currentTimeMillis();
+        JamesBot.arm.setElbow(false);    //Hold arm in
+        JamesBot.arm.enable();          //Enable closed loop control on arm
+        JamesBot.arm.setSpeedLimit(.8); //Halve the speed limit on the arm
+        JamesBot.arm.setPoint(Arm.ArmStates.HIGH);
+        JamesBot.robot.resetGyro();
+    }
+
+    /**
+     * Actual dumbAuton code
+     * This autonomous program brought us to the finals in the San Diego Regional
+     */
+
+    static boolean driveForward;
+    static boolean releaseTube;
+    static boolean pullBack;
+    static boolean turnSlightly;
+    static boolean pickUp;
+    public static void competentAuton() {
+
+        //JamesBot.arm.fold(true); no move to timer based
+
+        driveForward = System.currentTimeMillis() - startTime > 250  && System.currentTimeMillis() - startTime < 7300;
+        releaseTube  = System.currentTimeMillis() - startTime > 7300 && System.currentTimeMillis() - startTime < 7500;
+        pullBack     = System.currentTimeMillis() - startTime > 7500 && System.currentTimeMillis() - startTime < 9500;
+        JamesBot.arm.update();
+        if(driveForward) {
+            JamesBot.robot.driveStraight(.5, 0);
+        }
+        if(releaseTube) {
+            JamesBot.robot.arcadeDrive(0, 0);
+            JamesBot.roller.grab(-.5);
+        }
+
+        if(pullBack) {
+            JamesBot.robot.driveStraight(-1, 0);
+        }
+
+        if(System.currentTimeMillis() - startTime > 8500) {
+            JamesBot.robot.arcadeDrive(0,0);
+            JamesBot.arm.setPoint(Arm.ArmStates.GROUND);
+            JamesBot.roller.grab(0);
         }
 
     }
