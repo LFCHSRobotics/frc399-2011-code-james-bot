@@ -20,7 +20,7 @@ import org.team399.y2011.Humans.Driver;
 import org.team399.y2011.Humans.Operator;
 import org.team399.y2011.robot.actuators.DeploymentMechanism;
 import org.team399.y2011.robot.actuators.Flopper;
-import org.team399.y2011.communications.Driverstation;
+import org.team399.y2011.communications.Dashboard;
 
 /**
  * The VM is configured to automatically run this class, and to call the
@@ -31,12 +31,14 @@ import org.team399.y2011.communications.Driverstation;
  */
 public class JamesBot extends IterativeRobot {
 
+    //Driver inputs.outputs:
     public static Attack3Joystick leftJoy       = new Attack3Joystick(1);           //Left Joystick
     public static Attack3Joystick rightJoy      = new Attack3Joystick(2);           //Right Joystick
     public static Rumblepad2GamePad gamePad     = new Rumblepad2GamePad(3);         //Operator gamepad
     public static DriverStationUserInterface io = new DriverStationUserInterface(); //IO Board instance
-    public static Driverstation db              = new Driverstation();
+    public static Dashboard db                  = new Dashboard();                  //Dashboard instance
 
+    //Actuator outputs:
     public static DriveTrain robot           = new DriveTrain         ();     //DriveTrain instance, contains drive code
     public static DeploymentMechanism deploy = new DeploymentMechanism(3,4);  //Deployment mechanism instance
     public static Flopper flopper            = new Flopper            (1,2);  //Flopper mechanism instance
@@ -44,64 +46,73 @@ public class JamesBot extends IterativeRobot {
     public static RollerClaw roller          = new RollerClaw         ();     //Instance of the roller claw
     public static Compressor compressor      = new Compressor         (14,1); //Compressor instance
 
+    //Driver/Operator routines
     private Driver   driver   = new Driver  ("Sam");    //Driver Instance
     private Operator operator = new Operator("Jeremy"); //Operator instance
 
+    //Other variables:
     public static int autonomousMode = 0;
-    
-    public void disabledInit() {
-        arm.disable();  //Disable arm PID control    
-    }
 
+
+    /**
+     * Initialize robot
+     */
     public void robotInit() {
-
+        System.out.println("Hello World!!");
+        System.out.println("Started at: " + System.currentTimeMillis());
     }
 
-    long startTime;
+    /**
+     * Initialize disabled mode
+     */
+    public void disabledInit() {
+        arm.disable();  //Disable arm PID control
+    }
 
+    /**
+     * Run this during disabled mode
+     */
     public void disabledPeriodic() {
-       //arm.print();    //Print arm pot value
-       //db.sendDouble(arm.getPosition());
-       //db.sendDouble(arm.getSetpoint());
-       //db.commit();
+        boolean autonOff = io.getRightToggleSwitch();   //Disable autonomous switch
+                                                        //JIC we are paired with a 2-tube scorer
+        if(autonOff) {                                  //If autonomous is disabled
+            autonomousMode = 0;                         //Do nothing
+        } else {                                        //Else
+            if(io.getWhiteButton()) {                   //Select autonomous with the arcade buttons
+                autonomousMode = 1;
+            } else if(io.getBlackButton()) {
+                autonomousMode = 2;
+            } else if(io.getRedButton()) {
+                autonomousMode = 3;
+            } else if(io.getBlueButton()) {
+                autonomousMode = 4;
+            }
+        }
 
-       /*if(io.getRightToggleSwitch()) {
-           autonomousMode = 0;
-       } else*/
-       
-       
-       
-       //robot.driveStraight(0, 0);
-       
-       /*if(io.getWhiteButton()) {
-           autonomousMode = 1;
-       } else if(io.getBlackButton()) {
-           autonomousMode = 2;
-       } else if(io.getRedButton()) {
-           autonomousMode = 3;
-       } else if(io.getBlueButton()) {
-           autonomousMode = 4;
-       }*/
-
-       autonomousMode = 2;
+        if(leftJoy.getTrigger() && rightJoy.getTrigger()) { //Manual override JIC the IO board malfunctions
+            autonOff = false;
+        }
+        db.packAll(autonOff, autonomousMode, 0);    //Pack data into dashboard
+        db.commit();                                //Commit data to dashboard
     }
 
+    /**
+     * Initialize teleoperated mode
+     */
     public void teleopInit() {
-        
-        compressor.start(); //Start compressor
-        startTime = System.currentTimeMillis();
-        operator.init(Arm.ArmStates.GROUND, 1);
-        driver.init();
+        compressor.start();                     //Start compressor
+        operator.init(Arm.ArmStates.GROUND, 1); //Bring arm to pickup position, initialize operator
+        driver.init();                          //Initialize driver
     }
 
+    /**
+     * Run this during teleoperated mode
+     */
     public void teleopPeriodic() {
         driver.drive();     //Driver stuff
-        arm.print();    //Print arm pot value
         operator.operate(); //Operater stuff
     }
 
-
-    long starttime;
     public void autonomousInit() {
         //All autonomous programs require resetting of encoder and gyro, so we will do that
         robot.resetEncoder();           //Reset Encoder
@@ -109,33 +120,32 @@ public class JamesBot extends IterativeRobot {
         compressor.start();             //Start compressor
         switch(autonomousMode) {
             case 1: //Auton 1 requires some initialization, do it.
-                AutonomousRoutines.initDumbAuton(); break; //Init dumbAuton timers
+                AutonomousRoutines.initCompetentAuton(); break;
             case 2: //Auton 2 requires no initialization. at the moment.
-                AutonomousRoutines.initCompetentAuton();
-                break;
+                AutonomousRoutines.initCompetentAuton(); break;
             case 3: //Auton 3 does not exist, therefore we will not initialize it
                 break;
-            case 4: //Auton 4 does not exits, therefore we will not initialize it
+            case 4: //Auton 4 does not exist, therefore we will not initialize it
                 break;
-            default: //By default(IO board broke, buttons broke, etc) do dumbAuton stuff
-                AutonomousRoutines.initDumbAuton(); break; //Init dumbAuton timers
+            default: //By default(IO board broke, buttons broke, etc) do competentAuton stuff
+                AutonomousRoutines.initCompetentAuton(); break; //Init dumbAuton timers
        }
     }
     public void autonomousPeriodic() {
         switch(autonomousMode) {
             case 1: //If you pressed the white button before the match, do the dead reckonining timer autonomous(DRTA)
                 //This autonomous uses no sensors and brought us to the finals in SD
-                AutonomousRoutines.dumbAuton(); break;
-            case 2: //If you pressed the black one, do the autonomous that does nothing but drive straight
-                //Note: This is not a real autonomous program. Just a test for gyros and encoders
-                AutonomousRoutines.competentAuton();
+                //AutonomousRoutines.dumbAuton(); break;
+                AutonomousRoutines.competentAuton(); break;
+            case 2: //This autonomous program uses the gyro to go straight
+                AutonomousRoutines.competentAuton(); break;
             case 3:
                 break;
             case 4:
                 break;
-            default: //Otherwise, do the DRTA
-                AutonomousRoutines.dumbAuton(); break;
-                //robot.driveStraight(.5, 0); break;
+            default:
+                AutonomousRoutines.competentAuton(); break;
+                
        }
     }
 }

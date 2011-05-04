@@ -20,6 +20,7 @@ public class Operator {
      */
     public Operator(String who) {
         System.out.println(who + " is operating!");
+
     }
 
     /**
@@ -33,6 +34,7 @@ public class Operator {
         JamesBot.arm.update();
         JamesBot.arm.enable();
         JamesBot.arm.setSpeedLimit(speedLimit);
+        JamesBot.deploy.beginTimer();
     }
 
     int currentPoint = 0;
@@ -44,94 +46,41 @@ public class Operator {
      * Do operator stuff
      */
     public void operate() {
+        
+
+        
+    }
+
+    public void scoringControl() {
         /**********************************************************************
          * Arm stuff
          */
-        //if(JamesBot.io.getLeftToggleSwitch()) {
-        //JamesBot.arm.safeMode(JamesBot.gamePad.getRightY(), false);
 
-        
-            JamesBot.arm.enable();
-            currPad = JamesBot.gamePad.getDPad(Rumblepad2GamePad.DPadStates.UP) ||
-                      JamesBot.gamePad.getDPad(Rumblepad2GamePad.DPadStates.DOWN);  //currPad is true if a button is pressed
+        JamesBot.arm.enable();
 
-            currDelta = JamesBot.arm.getSetpoint() + (JamesBot.gamePad.getRightY()*.02);
+        currDelta = JamesBot.arm.getSetpoint() + (JamesBot.gamePad.getRightY()*.02);
+        if(JamesBot.gamePad.getDPad(Rumblepad2GamePad.DPadStates.DOWN)) {
+            JamesBot.arm.setPoint(Arm.ArmStates.GROUND);
+        } else if(JamesBot.gamePad.getDPad(Rumblepad2GamePad.DPadStates.UP)) {
+            JamesBot.arm.setPoint(Arm.ArmStates.HIGH);
+        } else if(JamesBot.gamePad.getDPad(Rumblepad2GamePad.DPadStates.RIGHT) ||
+                JamesBot.gamePad.getDPad(Rumblepad2GamePad.DPadStates.LEFT)) {
+            JamesBot.arm.setPoint(Arm.ArmStates.MID);
+        } else {
+            if(Math.abs(JamesBot.gamePad.getRightY()) > 0.1) {
+                JamesBot.arm.setPoint(currDelta);   //Arm Delta control
+            }
+            if(JamesBot.arm.getPosition() == Arm.ArmStates.GROUND) {    currentPoint = 1;}   //Sets currentPoint if the arm is moved manually
+                else if(JamesBot.arm.getPosition() == Arm.ArmStates.LOW) { currentPoint = 2;}
+                else if(JamesBot.arm.getPosition() == Arm.ArmStates.MID) { currentPoint = 3;}
+                else if(JamesBot.arm.getPosition() == Arm.ArmStates.HIGH) { currentPoint = 4;}
+        }
 
-//            if(JamesBot.gamePad.getLeftY() < -.8) {
-//                currentPoint = 4;
-//            } else if(JamesBot.gamePad.getLeftY() > .8) {
-//                currentPoint = 1;
-//            } else {
-//                if(JamesBot.gamePad.getDPad(Rumblepad2GamePad.DPadStates.UP) && currPad != prevPad) {
-//                    currentPoint++;
-//                    currentPoint = (currentPoint <= 0) ? 0 :                //Limit currentPoint from 0-5
-//                                  ((currentPoint >= 5) ? 5 : currentPoint); //Nested ternary operators FTW
-//                    switch(currentPoint) {
-//                        case 0: JamesBot.arm.setPoint(Arm.ArmStates.INSIDE);        break;   //Stowed setpoint
-//                        case 1: JamesBot.arm.setPoint(Arm.ArmStates.GROUND);        break;   //Ground pickup setpoint
-//                        case 2: JamesBot.arm.setPoint(Arm.ArmStates.LOW);           break;   //Low Peg Setpoint
-//                        case 3: JamesBot.arm.setPoint(Arm.ArmStates.MID);           break;   //Middle peg Setpoint
-//                        case 4: JamesBot.arm.setPoint(Arm.ArmStates.HIGH);          break;   //High peg setpoint
-//                        case 5: JamesBot.arm.setPoint(Arm.ArmStates.TOMAHAWK_HIGH); break;   //Tomahawk high peg setpoint
-//                    }
-//                } else if(JamesBot.gamePad.getDPad(Rumblepad2GamePad.DPadStates.DOWN) && currPad != prevPad)  {
-//                    currentPoint--;
-//                    currentPoint = (currentPoint <= 0) ? 0 :                //Limit currentPoint from 0-5
-//                                  ((currentPoint >= 5) ? 5 : currentPoint); //Nested ternary operators FTW
-//                    switch(currentPoint) {
-//                        case 0: JamesBot.arm.setPoint(Arm.ArmStates.INSIDE);        break;   //Stowed setpoint
-//                        case 1: JamesBot.arm.setPoint(Arm.ArmStates.GROUND);        break;   //Ground pickup setpoint
-//                        case 2: JamesBot.arm.setPoint(Arm.ArmStates.LOW);           break;   //Low Peg Setpoint
-//                        case 3: JamesBot.arm.setPoint(Arm.ArmStates.MID);           break;   //Middle peg Setpoint
-//                        case 4: JamesBot.arm.setPoint(Arm.ArmStates.HIGH);          break;   //High peg setpoint
-//                        case 5: JamesBot.arm.setPoint(Arm.ArmStates.TOMAHAWK_HIGH); break;   //Tomahawk high peg setpoint
-//                    }
-                //} else if(JamesBot.gamePad.getButton(11)) {
-                //    JamesBot.arm.setPoint(Arm.ArmStates.HIGH);
-                //} else if(JamesBot.) {
-                if(JamesBot.gamePad.getDPad(Rumblepad2GamePad.DPadStates.DOWN)) {
-                    JamesBot.arm.setPoint(Arm.ArmStates.GROUND);
-                } else if(JamesBot.gamePad.getDPad(Rumblepad2GamePad.DPadStates.UP)) {
-                    JamesBot.arm.setPoint(Arm.ArmStates.HIGH);
-                }else {
-                    if(Math.abs(JamesBot.gamePad.getRightY()) > 0.1) {
-                        JamesBot.arm.setPoint(currDelta);   //Arm Delta control
-                    }
+        JamesBot.arm.update();
+
+        JamesBot.arm.fold(JamesBot.gamePad.getButton(10) || JamesBot.gamePad.getButton(12));
 
 
-                    if(JamesBot.arm.getPosition() == Arm.ArmStates.GROUND) {    currentPoint = 1;}   //Sets currentPoint if the arm is moved manually
-                    else if(JamesBot.arm.getPosition() == Arm.ArmStates.LOW) { currentPoint = 2;}
-                    else if(JamesBot.arm.getPosition() == Arm.ArmStates.MID) { currentPoint = 3;}
-                    else if(JamesBot.arm.getPosition() == Arm.ArmStates.HIGH) { currentPoint = 4;}
-                }
-            //}
-
-
-            JamesBot.arm.update();
-
-            JamesBot.arm.fold(JamesBot.gamePad.getButton(10) || JamesBot.gamePad.getButton(12));
-
-
-            prevPad = currPad;
-        //} else {
-        //    JamesBot.arm.safeMode(JamesBot.gamePad.getRightY(), false);
-        //}
-
-        /**********************************************************************
-         * End Arm Code
-         */
-
-        /**********************************************************************
-         * Other gamePad controls
-         */
-
-        //Endgame Stuff:
-
-        JamesBot.flopper.flop(JamesBot.gamePad.getButton(9) || JamesBot.io.getMissileSwitch());   //Flop with either a gamepad button or the missile switch
-        JamesBot.deploy.deploy(JamesBot.gamePad.getButton(1) && JamesBot.gamePad.getButton(2) || //Deploy with either a gamepad button or
-                ((JamesBot.io.getBlackButton() || JamesBot.io.getBlueButton() ||          //The missile switch with any button on the button panel
-                  JamesBot.io.getRedButton() || JamesBot.io.getWhiteButton())) &&
-                  JamesBot.io.getMissileSwitch());
 
         //Roller Claw Stuff:
         if(JamesBot.gamePad.getButton(6)) {
@@ -139,12 +88,29 @@ public class Operator {
         } else if(JamesBot.gamePad.getButton(8)) {
             JamesBot.roller.grab(-.5);                   // release tube
         } else if(JamesBot.gamePad.getButton(7)) {
-            JamesBot.roller.articulate(.5);              // articulate tube up
+            JamesBot.roller.articulate(.7);              // articulate tube up
         } else if(JamesBot.gamePad.getButton(5)) {
-            JamesBot.roller.articulate(-.5);             // articulate tube down
+            JamesBot.roller.articulate(-.7);             // articulate tube down
         } else {
             JamesBot.roller.grab(0);
+        }
+    }
 
+    public void endGameControl() {
+
+        boolean manualDeploy = JamesBot.gamePad.getButton(1) && JamesBot.gamePad.getButton(2) || //Deploy with either a gamepad button or
+                        ((JamesBot.io.getBlackButton() ||JamesBot.io.getWhiteButton()));         //with the arcade butons
+        boolean autoTimeDeploy = JamesBot.io.getBlueButton() && JamesBot.io.getRedButton();
+        boolean safety = JamesBot.io.getMissileSwitch() || JamesBot.gamePad.getButton(1);
+
+        JamesBot.flopper.flop(JamesBot.gamePad.getButton(9) || JamesBot.io.getMissileSwitch());   //Flop with either a gamepad button or the missile switch
+
+        if(autoTimeDeploy) {                //Deploy with timers
+            JamesBot.deploy.timerDeploy();
+        } else {                            //Or manually
+            if(safety) {
+                JamesBot.deploy.deploy(manualDeploy);
+            }
         }
     }
 

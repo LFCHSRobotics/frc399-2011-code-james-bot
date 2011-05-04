@@ -119,4 +119,13 @@ public class DriverStationUserInterface {
             return 0.0;
         }
     }
+
+    public boolean isAttached() {
+        try {
+            return (!(m_io.getFirmwareVersion() == 0));
+        } catch(Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
 }
