@@ -23,7 +23,7 @@ public class ExceptionHandler {
     }
 
     public void print() {
-        m_excep.printStackTrace();
-        System.out.println("Exception at " + m_subsys + " thrown at: " + System.currentTimeMillis());
+        //m_excep.printStackTrace();
+        //System.out.println("Exception at " + m_subsys + " thrown at: " + System.currentTimeMillis());
     }
 }

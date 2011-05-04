@@ -14,6 +14,8 @@ import edu.wpi.first.wpilibj.DoubleSolenoid;
 public class DeploymentMechanism {
 
     private DoubleSolenoid deployActuator;  //The actuator
+    private long startTime = 0;             //StartTime for auto deploy timer
+    private long deployTime = 110000;       //Time to deploy minibot
 
     /**
      * Constructor
@@ -31,5 +33,39 @@ public class DeploymentMechanism {
     public void deploy(boolean state) {
         deployActuator.set(((state) ? DoubleSolenoid.Value.kForward :
             DoubleSolenoid.Value.kReverse));    //sets the solenoid
+    }
+
+    /**
+     * Begin automatic deployment timer
+     */
+    public void beginTimer() {
+        startTime = System.currentTimeMillis();
+    }
+
+    /**
+     * Deploy the minibot with a timer
+     */
+    public void timerDeploy() {
+        if(getTimeSinceStart() > deployTime) {
+            deploy(true);
+        } else {
+            deploy(false);
+        }
+    }
+
+    /**
+     * Get the current time on the clock
+     * @return the time returned by the system
+     */
+    public long getTimer() {
+        return System.currentTimeMillis();
+    }
+
+    /**
+     * get the time since beginTimer was last called
+     * @return the time since beginTimer was last called
+     */
+    public long getTimeSinceStart() {
+        return getTimer() - startTime;
     }
 }

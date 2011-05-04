@@ -9,9 +9,7 @@ import edu.wpi.first.wpilibj.Gyro;
 import edu.wpi.first.wpilibj.Solenoid;
 import edu.wpi.first.wpilibj.Encoder;
 import org.team399.y2011.robot.utilities.ExceptionHandler;
-
 import org.team399.y2011.robot.utilities.Math;
-//import java.lang.Math;
 
 /**
  *  DriveTrain Class. A wrapper class for CANJaguars.
@@ -24,7 +22,7 @@ public class DriveTrain {
     private CANJaguar rightA;    //Right motor A
     private CANJaguar rightB;    //Right Motor B
 
-    private Solenoid shiftA = new Solenoid(7);  //Shifter solenoids
+    private Solenoid shiftA = new Solenoid(7);      //Shifter solenoids
     private Solenoid shiftB = new Solenoid(8);
 
     private Encoder encoder  = new Encoder(8, 9);   //drive Encoder
@@ -77,51 +75,39 @@ public class DriveTrain {
         return encoder.get();
     }
 
+    /**
+     * Stop encoder counter
+     */
     public void stopEncoder() {
         encoder.stop();
     }
 
+    /**
+     * start encoder counter
+     */
     public void startEncoder() {
         encoder.start();
     }
 
+    /**
+     * Reset gyro integrator
+     */
     public void resetGyro() {
         yaw.reset();
     }
 
+    /**
+     * Get the angle from the gyro
+     * @return
+     */
     public double getAngle() {
         return yaw.getAngle();
-    }
-    
-    public void driveStraight(double counts, double throttle, double angle) {
-        final double P = .015; // the proportional scaler
-        double error = angle - yaw.getAngle();
-        double output = (P*error);
-        
-       System.out.println("Enc: " + getEncoderCounts());
-       System.out.println("Gyro:" + yaw.getAngle());
-
-        if(output > 1) {   //this limits our output to the motors to -1/1
-            output = 1;
-        } else if(-output < -1) {
-            output = -1;
-        }
-
-        if(getEncoderCounts() < counts) {   //this drives the robot and turns it based on the output
-            tankDrive(throttle-output, throttle);
-        } else {
-            tankDrive(0,0);
-        }
     }
 
     public void driveStraight(double throttle, double angle) {
         final double P = .125; // the proportional scaler
         double error = angle - yaw.getAngle();
         double outputRight = throttle - (P*error);
-
-       //System.out.println("Enc: " + getEncoderCounts());
-       System.out.println("Gyro:" + yaw.getAngle());
-
         if(outputRight > 1) {   //this limits our output to the motors to -1/1
             outputRight = 1;
         } else if(-outputRight < -1) {
@@ -194,6 +180,11 @@ public class DriveTrain {
         this.yaw = gyro;
     }
 
+        double p = .00015, proportional,
+                i = 0, d = 0, derivative,
+                pdOut;
+        double error, prevError;
+        double thresh = 5;
     /**
      * Angle drive method. Field centric with skid steer
      * @param gyro The gyro used for control
@@ -202,22 +193,23 @@ public class DriveTrain {
      */
     public void angleDrive(double throttle, double angle) {
         
-        double p = 0, proportional,
-                i = 0, d = 0;
-        double error, prevError;
-        double thresh = 10;
 
-        if(Math.threshold(yaw.getAngle(), (angle+thresh), (angle-thresh))) {
-            error = yaw.getAngle();
+        if(Math.threshold(getAngle(), (getAngle()+thresh), (getAngle()-thresh))) {
+            error = getAngle() - angle;
             proportional = (p*error);
-            if(proportional > 1) {
-                proportional = 1;
-            } else if(proportional < -1){
-                proportional = -1;
+            derivative = d*(error-prevError);
+            pdOut = proportional - derivative;
+            if(pdOut > throttle) {
+                pdOut = throttle;
+            } else if(pdOut < -throttle){
+                pdOut = -throttle;
             }
-            arcadeDrive(throttle, (proportional));
+            //System.out.println("Power: " + );
+
+            tankDrive(throttle + pdOut, throttle + pdOut);
+            prevError = error;
         } else {
-            arcadeDrive(throttle, 0);
+            arcadeDrive(0, 0);
         }
     }
 
@@ -227,7 +219,7 @@ public class DriveTrain {
      * @param hold Whether or not to hold
      */
     public void holdPosition(boolean hold) {
-        //TODO: test hold position method
+        
     }
     /**
      * Get Current at a single motor

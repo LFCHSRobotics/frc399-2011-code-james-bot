@@ -16,10 +16,7 @@ import org.team399.y2011.robot.utilities.ExceptionHandler;
  */
 public class Arm {
     private static double lowerLimit = 1.7377070460000001;
-    private static double upperLimit = lowerLimit - 1.2; //1.4599678200000001;
-    //TODO:  EDIT ArmState INTERFACE VALUES FOR PID SETPOINTS
-    //TODO:  FOR SETPOINTS, USE A RELATIVE SYSTEM. START ARM IN "DOWN" POSITION, EACH SETPOINT IS X FROM DOWN
-    
+    private static double upperLimit = lowerLimit - 1.2; 
     
     private CANJaguar armA; //Instance of arm CAN Jaguar, A
     private CANJaguar armB; //Instance of arm CAN Jaguar, B
@@ -83,20 +80,21 @@ public class Arm {
      */
     public void set(double value) {
         try {
-            if(/*pot.getAverageVoltage() > upperLimit &&*/      //Upper and lower limit logic
-                    pot.getAverageVoltage() < lowerLimit && enableSoftLimits) {
-                armA.setX(-value, (byte) 2);   //Set armA to the argument, value
-                armB.setX(value, (byte) 2);  //Set armB to the argument, value, times -1
-
-            } else if(pot.getAverageVoltage() > upperLimit && enableSoftLimits) {
-                armA.setX(-value , (byte) 2); //Set arm motors to value only if it is negative
-                armB.setX(value, (byte) 2);
-            } else if(pot.getAverageVoltage() < lowerLimit && enableSoftLimits) {
-                armA.setX(-((value <= 0) ? value : 0 ) , (byte) 2);   //Set arm motors to value only if it is positive
-                armB.setX(((value <= 0) ? value : 0 ), (byte) 2);
+            if(enableSoftLimits) {
+//                if(pot.getAverageVoltage() < lowerLimit) {
+//                    /*
+//                    armA.setX(-value, (byte) 2);   //Set armA to the argument, value
+//                    armB.setX(value, (byte) 2);  //Set armB to the argument, value, times -1
+//                    */
+//                    armA.setX(-((value <= 0) ? value : 0 ) , (byte) 2);   //Set arm motors to value only if it is positive
+//                    armB.setX(((value <= 0) ? value : 0 ), (byte) 2);
+//                } else if(pot.getAverageVoltage() > upperLimit) {
+                    armA.setX(-value , (byte) 2); //Set arm motors to value only if it is negative
+                    armB.setX(value, (byte) 2);
+                
             }
 
-            allowFolding = !(getSetpoint() > ArmStates.GROUND); //Automatic folding for the arm
+            //allowFolding = (getSetpoint() < ArmStates.GROUND); //Automatic folding for the arm
 
             CANJaguar.updateSyncGroup((byte) 2);    //Update the Sync group
         } catch(Throwable e) {
@@ -238,6 +236,10 @@ public class Arm {
     public void setElbow(boolean state) {
         hingeA.set(state);
         hingeB.set(!state);
+    }
+
+    public boolean getFoldOk() {
+        return allowFolding;
     }
 
     /**
