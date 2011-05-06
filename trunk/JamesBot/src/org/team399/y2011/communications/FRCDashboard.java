@@ -13,7 +13,7 @@ import edu.wpi.first.wpilibj.DriverStation;
  * Class containing methods for communicating with th driver station computer
  * @author Jeremy Germita
  */
-public class Dashboard {
+public class FRCDashboard {
     //private Dashboard m_dashHigh; //Commented out because it is never used. One less object to initialize
     private Dashboard m_dashLow;
     private DriverStationLCD m_lcd;
@@ -26,7 +26,7 @@ public class Dashboard {
     /**
      * Constructor.
      */
-    public Dashboard() {
+    public FRCDashboard() {
         //m_dashHigh = DriverStation.getInstance().getDashboardPackerHigh();
         m_dashLow  = DriverStation.getInstance().getDashboardPackerLow();
         m_lcd = DriverStationLCD.getInstance();

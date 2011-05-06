@@ -20,7 +20,7 @@ import org.team399.y2011.Humans.Driver;
 import org.team399.y2011.Humans.Operator;
 import org.team399.y2011.robot.actuators.DeploymentMechanism;
 import org.team399.y2011.robot.actuators.Flopper;
-import org.team399.y2011.communications.Dashboard;
+import org.team399.y2011.communications.FRCDashboard;
 
 /**
  * The VM is configured to automatically run this class, and to call the
@@ -36,7 +36,7 @@ public class JamesBot extends IterativeRobot {
     public static Attack3Joystick rightJoy      = new Attack3Joystick(2);           //Right Joystick
     public static Rumblepad2GamePad gamePad     = new Rumblepad2GamePad(3);         //Operator gamepad
     public static DriverStationUserInterface io = new DriverStationUserInterface(); //IO Board instance
-    public static Dashboard db                  = new Dashboard();                  //Dashboard instance
+    public static FRCDashboard db                  = new FRCDashboard();                  //Dashboard instance
 
     //Actuator outputs:
     public static DriveTrain robot           = new DriveTrain         ();     //DriveTrain instance, contains drive code
