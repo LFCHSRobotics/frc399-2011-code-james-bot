@@ -6,6 +6,8 @@
 package org.team399.y2011.Humans;
 
 import org.team399.y2011.robot.JamesBot;
+import java.lang.Math;
+import org.team399.y2011.robot.actuators.Arm;
 
 /**
  * Driver object. Used to clean up main teleop loop.
@@ -26,19 +28,24 @@ public class Driver {
      */
     public void init() {
         JamesBot.robot.tankDrive(0,0);
+        //JamesBot.robot.resetGyro();
     }
 
     /**
      * Drive robot
      */
     public void drive() {
-        if(!JamesBot.rightJoy.getButton(3)) {
+        if(JamesBot.rightJoy.getButton(3)) {
+            JamesBot.robot.arcadeDrive(-JamesBot.rightJoy.getY(), -(JamesBot.rightJoy.getX()*JamesBot.rightJoy.getX()*JamesBot.rightJoy.getX())); //Arcade Drive
+        } else {
+
             JamesBot.robot.tankDrive(JamesBot.leftJoy.getY(),
                             -JamesBot.rightJoy.getY());   //Tank drive, two sticks
-        } else {
-            JamesBot.robot.arcadeDrive(JamesBot.leftJoy.getX(), JamesBot.leftJoy.getY()); //Arcade Drive
         }
         JamesBot.robot.shift(JamesBot.rightJoy.getTrigger() || JamesBot.leftJoy.getTrigger()); //Shift the drivetrain()
+        if(JamesBot.leftJoy.getButton(2)) {
+            JamesBot.arm.setPoint(Arm.ArmStates.INSIDE);
+        }
 
     }
 }

@@ -15,7 +15,7 @@ import org.team399.y2011.robot.utilities.ExceptionHandler;
  * @author Jeremy Germita
  */
 public class Arm {
-    private static double lowerLimit = 1.7377070460000001;
+    private static double lowerLimit = 3.224126237;
     private static double upperLimit = lowerLimit - 1.2; 
     
     private CANJaguar armA; //Instance of arm CAN Jaguar, A
@@ -25,9 +25,6 @@ public class Arm {
     private Solenoid hingeB;
 
     private AnalogChannel pot;          //Instance of the potentiometer
-    private DigitalInput reedSwitch;    //Instance of the magnet switch
-
-    private boolean allowFolding = true;    //Enables/Disables folding control. Used for automatic folding
 
     //PID Variables:************************************************************
     private double processValue;                   //The potentiometer input
@@ -47,14 +44,11 @@ public class Arm {
         pot = new AnalogChannel(1); //potentiometer on analog 1
         hingeA = new Solenoid(aPort);  //Arm hinge solenoid
         hingeB = new Solenoid(bPort);  //Arm hinge solenoid
-        reedSwitch = new DigitalInput(13);  //Reed switch
         try {
             armA = new CANJaguar(4);    //armA is a CANJaguar with the address 6
             armB = new CANJaguar(7);    //armB is a CANJaguar with the address 7
             armA.configNeutralMode(CANJaguar.NeutralMode.kBrake); //Brake the motors
             armB.configNeutralMode(CANJaguar.NeutralMode.kBrake); //Brake the motors
-            //armA.setSafetyEnabled(true);    //Enable safety on the arm.
-            //armB.setSafetyEnabled(true);    //We don't want to kill anyone. :P
         } catch(Throwable e) {
             System.out.print("ERROR INITIALIZING ARM");
             new ExceptionHandler(e, "Arm").print();
@@ -65,13 +59,12 @@ public class Arm {
      * Arm state interface
      */
     public interface ArmStates {
-        //Lower limit is 3.867041112
         public static double HIGH          = lowerLimit - 0.6320549609999998;   //3.203552961
         public static double MID           = lowerLimit - 0.452612072;  //3.41442904
         public static double LOW           = lowerLimit - 0.344602373;  //3.522438739
         public static double GROUND        = lowerLimit - 0.1028663799999997;  //3.7641747320000003
         public static double INSIDE        = lowerLimit;
-        public static double TOMAHAWK_HIGH = lowerLimit - 0.684913839999999;
+        public static double TOMAHAWK_HIGH = lowerLimit - 0.5804602710000001;
     }
 
     /**
@@ -81,20 +74,9 @@ public class Arm {
     public void set(double value) {
         try {
             if(enableSoftLimits) {
-//                if(pot.getAverageVoltage() < lowerLimit) {
-//                    /*
-//                    armA.setX(-value, (byte) 2);   //Set armA to the argument, value
-//                    armB.setX(value, (byte) 2);  //Set armB to the argument, value, times -1
-//                    */
-//                    armA.setX(-((value <= 0) ? value : 0 ) , (byte) 2);   //Set arm motors to value only if it is positive
-//                    armB.setX(((value <= 0) ? value : 0 ), (byte) 2);
-//                } else if(pot.getAverageVoltage() > upperLimit) {
-                    armA.setX(-value , (byte) 2); //Set arm motors to value only if it is negative
-                    armB.setX(value, (byte) 2);
-                
+                armA.setX(-value , (byte) 2); //Set arm motors to value only if it is negative
+                armB.setX(value, (byte) 2);
             }
-
-            //allowFolding = (getSetpoint() < ArmStates.GROUND); //Automatic folding for the arm
 
             CANJaguar.updateSyncGroup((byte) 2);    //Update the Sync group
         } catch(Throwable e) {
@@ -107,13 +89,13 @@ public class Arm {
      */
     public void print() {
         System.out.println("Potentiometer Value: " + pot.getAverageVoltage());
-        //System.out.println("Setpoint: " + setpoint);
-        /*try { System.out.println("Speed: " + armA.getX()); }
-        catch (Exception e){  }*/
     }
 
-    public boolean getReedSwitch() {
-        return !reedSwitch.get();
+    /**
+     * Zero the potentiometer
+     */
+    public void zeroPotentiometer() {
+        lowerLimit = pot.getAverageVoltage();
     }
 
     /**
@@ -156,9 +138,7 @@ public class Arm {
      * @param point the setpoint
      */
     public void setPoint(double point) {
-      /*if(point <= upperLimit) {
-        setpoint = upperLimit;
-      } else */if(point >= lowerLimit) {
+      if(point >= lowerLimit) {
         setpoint = lowerLimit;
       } else {
         setpoint = point;
@@ -216,17 +196,13 @@ public class Arm {
      * @param shift A button input to fold the arm. Goes true to toggle the arm state
      */
     public void fold(boolean shift) {
-      //if(allowFolding) {
-            if(shift && !shifted) {
-                gear = !gear;
-                setElbow(gear);
-                shifted = true;
-            } else if(!shift) {
-                shifted = false;
-            }
-      //} //else {
-          //setElbow(true);
-      //}
+        if(shift && !shifted) {
+            gear = !gear;
+            setElbow(gear);
+            shifted = true;
+        } else if(!shift) {
+            shifted = false;
+        }
     }
 
     /**
@@ -236,10 +212,6 @@ public class Arm {
     public void setElbow(boolean state) {
         hingeA.set(state);
         hingeB.set(!state);
-    }
-
-    public boolean getFoldOk() {
-        return allowFolding;
     }
 
     /**
@@ -253,11 +225,9 @@ public class Arm {
     /**
      * Put the arm into safeMode
      * @param armSpeed Raw speed to send the arm
-     * @param limits
      */
-    public void safeMode(double armSpeed, boolean limits) {
-        disable();                  //Disables PID
+    public void safeMode(double armSpeed) {
+
         set(armSpeed);              //Sets the arm speed to the the argument
-        enableSoftLimits = limits;  //Enable/Disable software limits
     }
 }

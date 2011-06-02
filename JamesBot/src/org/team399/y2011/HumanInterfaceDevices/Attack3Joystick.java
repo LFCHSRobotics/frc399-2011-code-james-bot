@@ -5,6 +5,7 @@
 
 package org.team399.y2011.HumanInterfaceDevices;
 import edu.wpi.first.wpilibj.Joystick;
+import java.lang.Math;
 /**
  * A wrapper Class for use with the Logitech Attack 3 Joystick
  * @author Jeremy Germita
@@ -17,6 +18,11 @@ public class Attack3Joystick {
      */
     public Attack3Joystick(int port) {
         m_Stick = new Joystick(port);   //Instantiate joystick on desired port
+    }
+
+    public double getAngle() {
+        return m_Stick.getDirectionDegrees();
+
     }
 
     /**

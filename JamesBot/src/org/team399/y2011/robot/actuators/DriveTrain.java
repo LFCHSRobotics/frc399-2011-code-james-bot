@@ -180,7 +180,7 @@ public class DriveTrain {
         this.yaw = gyro;
     }
 
-        double p = .00015, proportional,
+        double p = .15, proportional, //p=.00015
                 i = 0, d = 0, derivative,
                 pdOut;
         double error, prevError;

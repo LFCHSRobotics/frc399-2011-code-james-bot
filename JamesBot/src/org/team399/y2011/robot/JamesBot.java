@@ -31,7 +31,7 @@ import org.team399.y2011.communications.FRCDashboard;
  */
 public class JamesBot extends IterativeRobot {
 
-    //Driver inputs.outputs:
+    //Driver inputs/outputs:
     public static Attack3Joystick leftJoy       = new Attack3Joystick(1);           //Left Joystick
     public static Attack3Joystick rightJoy      = new Attack3Joystick(2);           //Right Joystick
     public static Rumblepad2GamePad gamePad     = new Rumblepad2GamePad(3);         //Operator gamepad
@@ -47,8 +47,8 @@ public class JamesBot extends IterativeRobot {
     public static Compressor compressor      = new Compressor         (14,1); //Compressor instance
 
     //Driver/Operator routines
-    private Driver   driver   = new Driver  ("Sam");    //Driver Instance
-    private Operator operator = new Operator("Jeremy"); //Operator instance
+    private Driver   driver   = new Driver  ("Jeremy");    //Driver Instance
+    private Operator operator = new Operator("Gabe");      //Operator instance
 
     //Other variables:
     public static int autonomousMode = 0;
@@ -94,6 +94,7 @@ public class JamesBot extends IterativeRobot {
         }
         db.packAll(autonOff, autonomousMode, 0);    //Pack data into dashboard
         db.commit();                                //Commit data to dashboard
+        arm.print();
     }
 
     /**

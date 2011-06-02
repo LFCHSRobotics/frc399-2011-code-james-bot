@@ -104,8 +104,19 @@ public class AutonomousRoutines {
             percent = 100;
         }
 
+        /**
+         * TTTTT EEEEE SSSSS TTTTT  !!
+         *   T   E     S       T    !!
+         *   T   EEE   SSSSS   T    !!
+         *   T   E         S   T
+             T   EEEEE SSSSS   T    !!
+         */
         if(System.currentTimeMillis() - startTime > 11000) {
-            //Turn around
+            if(JamesBot.robot.getAngle() < 180) {
+                JamesBot.robot.arcadeDrive(0, .5);
+            } else {
+                JamesBot.robot.arcadeDrive(0,0);
+            }
         }
         JamesBot.db.commit();
     }

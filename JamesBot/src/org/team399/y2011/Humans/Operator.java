@@ -46,9 +46,8 @@ public class Operator {
      * Do operator stuff
      */
     public void operate() {
-        
-
-        
+        scoringControl();
+        endGameControl();        
     }
 
     public void scoringControl() {
@@ -58,35 +57,30 @@ public class Operator {
 
         JamesBot.arm.enable();
 
-        currDelta = JamesBot.arm.getSetpoint() + (JamesBot.gamePad.getRightY()*.02);
+        double deltaGain = .015; //Increasing this will increase the speed at which the delta increases. This will increase arm "Laggy-ness"
+        currDelta = JamesBot.arm.getSetpoint() + (JamesBot.gamePad.getRightY()*deltaGain);
         if(JamesBot.gamePad.getDPad(Rumblepad2GamePad.DPadStates.DOWN)) {
             JamesBot.arm.setPoint(Arm.ArmStates.GROUND);
         } else if(JamesBot.gamePad.getDPad(Rumblepad2GamePad.DPadStates.UP)) {
             JamesBot.arm.setPoint(Arm.ArmStates.HIGH);
         } else if(JamesBot.gamePad.getDPad(Rumblepad2GamePad.DPadStates.RIGHT) ||
-                JamesBot.gamePad.getDPad(Rumblepad2GamePad.DPadStates.LEFT)) {
+            JamesBot.gamePad.getDPad(Rumblepad2GamePad.DPadStates.LEFT)) {
             JamesBot.arm.setPoint(Arm.ArmStates.MID);
         } else {
             if(Math.abs(JamesBot.gamePad.getRightY()) > 0.1) {
                 JamesBot.arm.setPoint(currDelta);   //Arm Delta control
             }
-            if(JamesBot.arm.getPosition() == Arm.ArmStates.GROUND) {    currentPoint = 1;}   //Sets currentPoint if the arm is moved manually
-                else if(JamesBot.arm.getPosition() == Arm.ArmStates.LOW) { currentPoint = 2;}
-                else if(JamesBot.arm.getPosition() == Arm.ArmStates.MID) { currentPoint = 3;}
-                else if(JamesBot.arm.getPosition() == Arm.ArmStates.HIGH) { currentPoint = 4;}
         }
 
         JamesBot.arm.update();
 
-        JamesBot.arm.fold(JamesBot.gamePad.getButton(10) || JamesBot.gamePad.getButton(12));
-
-
+        JamesBot.arm.fold(JamesBot.gamePad.getButton(10) || JamesBot.gamePad.getButton(12) || JamesBot.leftJoy.getButton(2));
 
         //Roller Claw Stuff:
         if(JamesBot.gamePad.getButton(6)) {
-            JamesBot.roller.grab(1);                    // Grab tube
+            JamesBot.roller.holdTube();
         } else if(JamesBot.gamePad.getButton(8)) {
-            JamesBot.roller.grab(-.5);                   // release tube
+            JamesBot.roller.spitTube();
         } else if(JamesBot.gamePad.getButton(7)) {
             JamesBot.roller.articulate(.7);              // articulate tube up
         } else if(JamesBot.gamePad.getButton(5)) {
@@ -94,6 +88,8 @@ public class Operator {
         } else {
             JamesBot.roller.grab(0);
         }
+
+        JamesBot.arm.print();
     }
 
     public void endGameControl() {
