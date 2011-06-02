@@ -6,6 +6,8 @@
 package org.team399.y2011.robot.actuators;
 
 import edu.wpi.first.wpilibj.CANJaguar;
+import edu.wpi.first.wpilibj.DigitalInput;
+import org.team399.y2011.robot.utilities.ExceptionHandler;
 
 /**
  * Roller claw class
@@ -14,6 +16,7 @@ import edu.wpi.first.wpilibj.CANJaguar;
 public class RollerClaw {
 
     private CANJaguar rollerA, rollerB; //The roller CANJaguars
+    private DigitalInput limit;
 
     /**
      * Constructor
@@ -22,10 +25,15 @@ public class RollerClaw {
         try {
             rollerA = new CANJaguar(3); //Create CANJaguar objects on addresses
             rollerB = new CANJaguar(9); //3 and 9
+            rollerA.configNeutralMode(CANJaguar.NeutralMode.kCoast);
+            rollerB.configNeutralMode(CANJaguar.NeutralMode.kCoast);
         } catch(Exception e) {
             e.printStackTrace();
             System.out.println("ERROR INITIALIZING ROLLER CLAW");
         }
+
+        limit = new DigitalInput(1);
+
     }
 
     /**
@@ -55,6 +63,37 @@ public class RollerClaw {
     }
 
     /**
+     * Get the state of the limit switches on the claw
+     * @return Limit switch state
+     */
+    public boolean getLimitSwitch() {
+        return !limit.get();
+    }
+
+    /**
+     * Automatic hold tube method
+     */
+    public void holdTube() {
+        if(!getLimitSwitch()) {
+            grab(1);
+        } else {
+            grab(0);
+        }
+    }
+
+    /**
+     * Automatic spit tube method
+     */
+    public void spitTube() {
+        if(getLimitSwitch()) {
+            grab(-1);
+        } else {
+            grab(-.5);
+        }
+    }
+
+
+    /**
      * Run a motor at the set speed
      * @param motor 0 for motorA, 1 for motorB
      * @param speed the speed to run said motor
@@ -75,6 +114,32 @@ public class RollerClaw {
                     e.printStackTrace();
                 }
                 break;
+        }
+    }
+
+    /**
+     * Get the output current of motor A
+     * @return Current
+     */
+    public double getCurrentA() {
+        try {
+            return rollerA.getOutputCurrent();
+        } catch (Exception e) {
+            new ExceptionHandler(e, "Roller Claw").print();
+            return -0;
+        }
+    }
+
+    /**
+     * Get the output current of motor b
+     * @return Current
+     */
+    public double getCurrentB() {
+        try {
+            return rollerB.getOutputCurrent();
+        } catch (Exception e) {
+            new ExceptionHandler(e, "Roller Claw").print();
+            return -0;
         }
     }
 
