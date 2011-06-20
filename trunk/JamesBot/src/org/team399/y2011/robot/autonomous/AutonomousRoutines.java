@@ -73,6 +73,7 @@ public class AutonomousRoutines {
      * This autonomous program Helped us to win the Utah regional
      */
     public static void competentAuton() {
+        JamesBot.robot.lowGear();
 
         JamesBot.db.packAll(true, 2, percent);
 
@@ -113,7 +114,7 @@ public class AutonomousRoutines {
          */
         if(System.currentTimeMillis() - startTime > 11000) {
             if(JamesBot.robot.getAngle() < 180) {
-                JamesBot.robot.arcadeDrive(0, .5);
+                JamesBot.robot.arcadeDrive(0, - .5);
             } else {
                 JamesBot.robot.arcadeDrive(0,0);
             }

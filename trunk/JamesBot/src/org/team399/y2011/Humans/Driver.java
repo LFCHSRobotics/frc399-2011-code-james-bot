@@ -38,7 +38,6 @@ public class Driver {
         if(JamesBot.rightJoy.getButton(3)) {
             JamesBot.robot.arcadeDrive(-JamesBot.rightJoy.getY(), -(JamesBot.rightJoy.getX()*JamesBot.rightJoy.getX()*JamesBot.rightJoy.getX())); //Arcade Drive
         } else {
-
             JamesBot.robot.tankDrive(JamesBot.leftJoy.getY(),
                             -JamesBot.rightJoy.getY());   //Tank drive, two sticks
         }
@@ -46,6 +45,10 @@ public class Driver {
         if(JamesBot.leftJoy.getButton(2)) {
             JamesBot.arm.setPoint(Arm.ArmStates.INSIDE);
         }
+
+    }
+
+    public void autoPush(double throttle) {
 
     }
 }
