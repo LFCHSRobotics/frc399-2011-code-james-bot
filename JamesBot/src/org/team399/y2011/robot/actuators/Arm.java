@@ -7,7 +7,6 @@ package org.team399.y2011.robot.actuators;
 import edu.wpi.first.wpilibj.AnalogChannel;
 import edu.wpi.first.wpilibj.CANJaguar;
 import edu.wpi.first.wpilibj.Solenoid;
-import edu.wpi.first.wpilibj.DigitalInput;
 import org.team399.y2011.robot.utilities.ExceptionHandler;
 
 /**
@@ -15,8 +14,7 @@ import org.team399.y2011.robot.utilities.ExceptionHandler;
  * @author Jeremy Germita
  */
 public class Arm {
-    private static double lowerLimit = 3.224126237;
-    private static double upperLimit = lowerLimit - 1.2; 
+    private static double lowerLimit = 3.795034646;
     
     private CANJaguar armA; //Instance of arm CAN Jaguar, A
     private CANJaguar armB; //Instance of arm CAN Jaguar, B
@@ -28,7 +26,7 @@ public class Arm {
 
     //PID Variables:************************************************************
     private double processValue;                   //The potentiometer input
-    private final double P = 9, I = .01, D = 0; //P, I, and D values
+    private final double P = 9, I = .09, D = 0; //P, I, and D values
     private double error, prevError, output, integral, derivative; //Other values needed by PID
     private boolean enabled = true;                //Enables/Disables closed loop PID
     private double speedLimit = 1;                 //Speed limit for arm. Defaults to 1(full power)
@@ -53,6 +51,8 @@ public class Arm {
             System.out.print("ERROR INITIALIZING ARM");
             new ExceptionHandler(e, "Arm").print();
         }
+
+
     }
 
     /**
@@ -82,6 +82,9 @@ public class Arm {
         } catch(Throwable e) {
             new ExceptionHandler(e, "Arm").print();
         }
+
+        System.out.println("Arm Power:" + value);
+        
     }
 
     /**
@@ -227,7 +230,15 @@ public class Arm {
      * @param armSpeed Raw speed to send the arm
      */
     public void safeMode(double armSpeed) {
-
         set(armSpeed);              //Sets the arm speed to the the argument
+    }
+
+    /**
+     * Stop and zero the arm potentiometer value
+     */
+    public void zero() {
+        disable();
+        lowerLimit = getPosition();
+        enable();
     }
 }

@@ -221,6 +221,11 @@ public class DriveTrain {
     public void holdPosition(boolean hold) {
         
     }
+
+    public void lowGear() {
+        shiftA.set(false);
+        shiftB.set(true);
+    }
     /**
      * Get Current at a single motor
      * @param motor The motor to get current from. kLeftA, kLeftB, kRightA, kRightB
