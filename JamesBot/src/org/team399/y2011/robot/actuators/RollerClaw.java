@@ -143,4 +143,13 @@ public class RollerClaw {
         }
     }
 
+    public static class CURRENT_LEVELS {
+        public static class UPPER_MOTOR {
+
+        }
+        public static class LOWER_MOTOR {
+            
+        }
+    }
+
 }

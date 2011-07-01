@@ -9,7 +9,7 @@ package org.team399.y2011.robot.Safety;
  *
  * @author robotics
  */
-public class ArmSafetyThread extends Thread {
+public class ArmSafetyThread {
 
     private boolean fault = false;
     private double current;
@@ -23,8 +23,24 @@ public class ArmSafetyThread extends Thread {
     private double prevPosition;
     private final int POSITION_DANGER_COUNT = 0;
 
-    public void update(double t_current, double t_position, double t_speed, double t_temp) {
+    private final double TEMPERATURE_DANGER_LEVEL = 4.0;
 
+    //Note to self: check to see if the rate at which this thread runs is not faster than
+    //the speed of the FRC periodic methods. If that is true, then the counters would run
+    //faster here than in the main thread.
+
+    /**
+     * Updates all variables to watch. Must be updated in every loop or a fault will occur.
+     * @param t_current
+     * @param t_position
+     * @param t_speed
+     * @param t_temp
+     */
+    public void update(double t_current, double t_position, double t_speed, double t_temp) {
+        current = t_current;    //Read values into the variables for monitoring
+        position = t_position;
+        speed = t_speed;
+        temp = t_temp;
     }
 
     public boolean getFault() {
@@ -32,7 +48,7 @@ public class ArmSafetyThread extends Thread {
     }
 
     public void run() {
-
+        fault = watchCurrent() || watchPosition() || watchTemperature();
     }
 
     private int currCount = 0;
@@ -67,6 +83,6 @@ public class ArmSafetyThread extends Thread {
     }
 
     private boolean watchTemperature() {
-
+        return temp > TEMPERATURE_DANGER_LEVEL;
     }
 }
