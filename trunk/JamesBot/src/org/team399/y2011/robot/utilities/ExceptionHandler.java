@@ -23,12 +23,12 @@ public class ExceptionHandler {
     public ExceptionHandler(Throwable e, String subSysName) {
         m_excep = e;
         m_subsys = subSysName;
-        lcd = DriverStationLCD.getInstance();
+        //lcd = DriverStationLCD.getInstance();
     }
 
     public void print() {
         //m_excep.printStackTrace();
         //System.out.println("Exception at " + m_subsys + " thrown at: " + System.currentTimeMillis());
-        lcd.println(DriverStationLCD.Line.kUser2, 0, "Exception Thrown at " + m_subsys);
+        //lcd.println(DriverStationLCD.Line.kUser2, 0, "Exception Thrown at " + m_subsys);
     }
 }

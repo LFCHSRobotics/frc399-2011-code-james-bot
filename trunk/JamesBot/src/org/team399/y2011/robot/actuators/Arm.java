@@ -14,7 +14,7 @@ import org.team399.y2011.robot.utilities.ExceptionHandler;
  * @author Jeremy Germita
  */
 public class Arm {
-    private static double lowerLimit = 3.795034646;
+    private static double lowerLimit = 3.136689814;
     
     private CANJaguar armA; //Instance of arm CAN Jaguar, A
     private CANJaguar armB; //Instance of arm CAN Jaguar, B

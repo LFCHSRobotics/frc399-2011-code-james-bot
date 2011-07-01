@@ -57,7 +57,7 @@ public class Operator {
 
         JamesBot.arm.enable();
 
-        double deltaGain = .02; //Increasing this will increase the speed at which the delta increases. This will increase arm "Laggy-ness"
+        double deltaGain = .015; //Increasing this will increase the speed at which the delta increases. This will increase arm "Laggy-ness"
         currDelta = JamesBot.arm.getSetpoint() + (JamesBot.gamePad.getRightY()*deltaGain);
         if(JamesBot.gamePad.getDPad(Rumblepad2GamePad.DPadStates.DOWN)) {
             JamesBot.arm.setPoint(Arm.ArmStates.GROUND);
