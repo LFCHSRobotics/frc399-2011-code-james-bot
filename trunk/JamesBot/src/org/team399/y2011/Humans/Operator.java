@@ -55,7 +55,7 @@ public class Operator {
          * Arm stuff
          */
 
-        JamesBot.arm.enable();
+        //JamesBot.arm.enable();
 
         double deltaGain = .015; //Increasing this will increase the speed at which the delta increases. This will increase arm "Laggy-ness"
         currDelta = JamesBot.arm.getSetpoint() + (JamesBot.gamePad.getRightY()*deltaGain);
@@ -66,13 +66,15 @@ public class Operator {
         } else if(JamesBot.gamePad.getDPad(Rumblepad2GamePad.DPadStates.RIGHT) ||
             JamesBot.gamePad.getDPad(Rumblepad2GamePad.DPadStates.LEFT)) {
             JamesBot.arm.setPoint(Arm.ArmStates.MID);
+        } else if(JamesBot.gamePad.getButton(10)) {
+            JamesBot.arm.setPoint(Arm.ArmStates.INSIDE);
         } else {
             if(Math.abs(JamesBot.gamePad.getRightY()) > 0.1) {
                 JamesBot.arm.setPoint(currDelta);   //Arm Delta control
             }
         }
 
-        JamesBot.arm.update();
+        
 
         JamesBot.arm.fold(JamesBot.gamePad.getButton(10) || JamesBot.gamePad.getButton(12) || JamesBot.leftJoy.getButton(2));
 
@@ -89,7 +91,17 @@ public class Operator {
             JamesBot.roller.grab(0);
         }
 
-        JamesBot.arm.print();
+        if(JamesBot.gamePad.getButton(11)) {
+            JamesBot.arm.disable();
+            JamesBot.arm.set(-JamesBot.gamePad.getLeftY());
+            JamesBot.arm.setPoint(Arm.ArmStates.INSIDE);
+            JamesBot.arm.zeroPotentiometer();
+        } else {
+            JamesBot.arm.enable();
+            JamesBot.arm.update();
+        }
+
+        //JamesBot.arm.print();
     }
 
     public void endGameControl() {

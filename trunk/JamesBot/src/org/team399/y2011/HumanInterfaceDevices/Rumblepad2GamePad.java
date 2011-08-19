@@ -83,4 +83,10 @@ public class Rumblepad2GamePad {
         final int LEFT = 2;
         final int RIGHT = 3;
     }
+
+    public boolean getAny() {
+        return getButton(1) || getButton(2) || getButton(3) || getButton(4) || getButton(5) ||
+               getButton(6) || getButton(7) || getButton(8) || getButton(9) || getButton(10) ||
+               getButton(11) || getButton(12);
+    }
 }

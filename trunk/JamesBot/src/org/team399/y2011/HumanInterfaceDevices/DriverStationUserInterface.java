@@ -6,6 +6,7 @@
 package org.team399.y2011.HumanInterfaceDevices;
 import edu.wpi.first.wpilibj.DriverStationEnhancedIO;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.DriverStationEnhancedIO.EnhancedIOException;
 
 /**
  * Driver Station User Interface Class. A wrapper class for the Cypress PSoC
@@ -14,7 +15,9 @@ import edu.wpi.first.wpilibj.DriverStation;
 public class DriverStationUserInterface {
 
     private DriverStationEnhancedIO m_io;   //IO board object
+    private boolean fault = false;
 
+    //Digital channels for the different switches
     final short BLUE_BUTTON        = 11;
     final short RED_BUTTON         = 1;
     final short WHITE_BUTTON       = 9;
@@ -22,16 +25,22 @@ public class DriverStationUserInterface {
     final short TOGGLE_SWITCH_LEFT = 12;
     final short TOGGLE_SWITCH_RIGHT= 6;
     final short MISSILE_SWITCH     = 2;
-    final short EASY_BUTTON        = 7;
 
 
     /**
      * Constructor.
      */
-
     public DriverStationUserInterface() {
         m_io = DriverStation.getInstance().getEnhancedIO(); //Instantiating the object
+        //try {
+            //m_io.getAnalogIn(1);
+        //} catch(EnhancedIOException e) {
+            //fault = true;
+        //    e.printStackTrace();
+        //}
     }
+
+
 
     /**
      * Get the state of the blue button
@@ -90,42 +99,66 @@ public class DriverStationUserInterface {
     }
 
     /**
-     * Get the state of the easy button
-     * @return <b><i> that was easy </i></b>(The state of the easy button)
-     */
-    public boolean getEasyButton() {
-        return getDigital(EASY_BUTTON);
-    }
-
-    /**
      * Get the state of a digital input
      * @param which The channel
      * @return The state of the digital input
      */
     public boolean getDigital(int which) {
-        try {
-            return m_io.getDigital(which);
-        } catch(Exception e) {
-            e.printStackTrace();
-            return false;
-        }
+        //if(!fault) {
+            try {
+                return m_io.getDigital(which);
+            } catch(Exception e) {
+                e.printStackTrace();
+                //fault = true;
+                return false;
+            }
+        //} else {
+        //    return false;
+        //}
     }
 
+    /**
+     * Get the value of the analog channel specified
+     * @param which Which channel
+     * @return the value of that channel, usually between 0 and 3.3
+     */
     public double getAnalog(int which) {
-        try {
-            return m_io.getAnalogIn(which);
-        } catch(Exception e) {
-            e.printStackTrace();
-            return 0.0;
-        }
+        //if(!fault) {
+            try {
+                return m_io.getAnalogIn(which);
+            } catch(Exception e) {
+                e.printStackTrace();
+                //fault = true;
+                return 0.0;
+            }
+        //} else {
+        //    return 0.0;
+        //}
     }
 
-    public boolean isAttached() {
+    /**
+     * Return false during normal activity, true if the board is not plugged in
+     * @return false during normal activity, true if the board is not plugged in
+     */
+    public boolean getFault() {
+        fault = false;
         try {
-            return (!(m_io.getFirmwareVersion() == 0));
-        } catch(Exception e) {
-            e.printStackTrace();
-            return false;
+            m_io.getAnalogIn(1);
+        } catch(EnhancedIOException eioe) {
+            eioe.printStackTrace();
+            fault = true;
         }
+        return fault;
+    }
+
+    public void setIndicators(boolean state) {
+        
+            try {
+                m_io.setLED(1, state);
+                m_io.setLED(5, state);
+            } catch(Exception e) {
+                e.printStackTrace();
+            }
+        
     }
 }

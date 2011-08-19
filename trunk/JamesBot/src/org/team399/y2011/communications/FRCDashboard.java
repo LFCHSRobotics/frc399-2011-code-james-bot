@@ -5,9 +5,10 @@
 
 package org.team399.y2011.communications;
 import edu.wpi.first.wpilibj.Dashboard;
-import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStationLCD;
 import edu.wpi.first.wpilibj.DriverStation;
+import org.team399.y2011.robot.JamesBot;
+import org.team399.y2011.robot.actuators.Arm;
 
 /**
  * Class containing methods for communicating with th driver station computer
@@ -18,10 +19,7 @@ public class FRCDashboard {
     private Dashboard m_dashLow;
     private DriverStationLCD m_lcd;
     private DriverStation m_ds;
-    //TODO: add to this class.
-    //TODO: FRCDashboard stuff
-    //TODO: FRCDashboard stuff
-    //TODO:
+    private String m_diag_print = null;
 
     /**
      * Constructor.
@@ -52,10 +50,12 @@ public class FRCDashboard {
         m_dashLow.addInt(data);
     }
 
-    public void packAll(boolean boolData, int intDataA, int intDataB) {
-        sendBoolean(boolData);
-        sendInt(intDataA);
-        sendInt(intDataB);
+    public void sendString(String data) {
+        m_dashLow.addString(data);
+    }
+
+    public void setDiagnosticPrintout(String data) {
+        m_diag_print = data;
     }
 
     public void commit() {
@@ -66,6 +66,59 @@ public class FRCDashboard {
         String outDataAlliance = m_ds.getAlliance() == DriverStation.Alliance.kBlue ?
                           "Blue " : "Red ";
         return outDataAlliance + m_ds.getLocation();
+    }
+
+    private boolean left = false, right = false, gamepad = false;
+
+
+    public void disabledPackAll() {
+        if(JamesBot.leftJoy.getAny()) {
+            left = true;
+        }
+
+        if(JamesBot.rightJoy.getAny()) {
+            right = true;
+        }
+
+        if(JamesBot.gamePad.getAny()) {
+            gamepad = true;
+        }
+        sendBoolean(left);
+        sendBoolean(right);
+        sendBoolean(gamepad);
+        sendBoolean(!JamesBot.io.getFault());
+        sendBoolean(JamesBot.autonomousMode == 1);
+        sendDouble(Arm.ArmStates.LOWER_LIMIT - JamesBot.arm.getPosition());
+        sendDouble(Arm.ArmStates.LOWER_LIMIT - JamesBot.arm.getSetpoint());
+        sendDouble(JamesBot.arm.getCurrent());
+        sendString(m_diag_print);
+        commit();
+    }
+
+    public void autonomousPackAll() {
+        sendBoolean(true);
+        sendBoolean(true);
+        sendBoolean(true);
+        sendBoolean(true);
+        sendBoolean(JamesBot.autonomousMode == 1);
+        sendDouble(Arm.ArmStates.LOWER_LIMIT - JamesBot.arm.getPosition());
+        sendDouble(Arm.ArmStates.LOWER_LIMIT - JamesBot.arm.getSetpoint());
+        sendDouble(JamesBot.arm.getCurrent());
+        sendString(m_diag_print);
+        commit();
+    }
+
+    public void teleopPackAll() {
+        sendBoolean(true);
+        sendBoolean(true);
+        sendBoolean(true);
+        sendBoolean(true);
+        sendBoolean(true);
+        sendDouble(Arm.ArmStates.LOWER_LIMIT - JamesBot.arm.getPosition());
+        sendDouble(Arm.ArmStates.LOWER_LIMIT - JamesBot.arm.getSetpoint());
+        sendDouble(JamesBot.arm.getCurrent());
+        sendString(m_diag_print);
+        commit();
     }
 
 }
