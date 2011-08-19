@@ -95,26 +95,43 @@ public class DriveTrain {
     public void resetGyro() {
         yaw.reset();
     }
-
+    
     /**
      * Get the angle from the gyro
      * @return
      */
+    public double getAngleWraparound() {
+        double angle = yaw.getAngle();
+        if(angle < 0.0) {
+            angle += 360;
+        } else if(angle > 360.0) {
+            angle -= 360;
+        }
+        return angle;
+    }
+
     public double getAngle() {
         return yaw.getAngle();
     }
 
+    public void print() {
+        System.out.println("Angle: " + getAngle());
+    }
+
+    double prevError = 0;
     public void driveStraight(double throttle, double angle) {
-        final double P = .125; // the proportional scaler
+        final double P = .15; // the proportional scaler
+        final double D = .05;
+
         double error = angle - yaw.getAngle();
-        double outputRight = throttle - (P*error);
+        double outputRight = throttle - ((P*error) - (D*(error - prevError)));
         if(outputRight > 1) {   //this limits our output to the motors to -1/1
             outputRight = 1;
         } else if(-outputRight < -1) {
             outputRight = -1;
         }
-       System.out.println("Output: " + outputRight);
-
+        System.out.println("Output: " + outputRight);
+        prevError = error;
         tankDrive(-throttle, outputRight);
     }
 
@@ -133,6 +150,7 @@ public class DriveTrain {
      */
     public void tankDrive(double leftV, double rightV) {
         try {
+
             leftA.setX(leftV,(byte) 1);       //Set left motor A
             leftB.setX(leftV,(byte) 1);       //Set left motor B
             rightA.setX(rightV,(byte) 1);     //Set right motor A
@@ -179,52 +197,44 @@ public class DriveTrain {
     public void setGyro(Gyro gyro) {
         this.yaw = gyro;
     }
-
-        double p = .15, proportional, //p=.00015
-                i = 0, d = 0, derivative,
-                pdOut;
-        double error, prevError;
-        double thresh = 5;
+/*
+    double p = -.0015, proportional, //p=.00015
+            i = 0, d = 0, derivative,
+            pdOut;
+    double error, prevError;
+    double thresh = 5;
     /**
      * Angle drive method. Field centric with skid steer
      * @param gyro The gyro used for control
      * @param throttle The speed to run the motors
      * @param angle The angle to drive to
-     */
+     
     public void angleDrive(double throttle, double angle) {
         
-
-        if(Math.threshold(getAngle(), (getAngle()+thresh), (getAngle()-thresh))) {
-            error = getAngle() - angle;
+            error = angle - getAngle();
             proportional = (p*error);
             derivative = d*(error-prevError);
-            pdOut = proportional - derivative;
+            pdOut = proportional;// - derivative;
             if(pdOut > throttle) {
                 pdOut = throttle;
             } else if(pdOut < -throttle){
                 pdOut = -throttle;
             }
-            //System.out.println("Power: " + );
+            System.out.println("Angle: " + getAngleWraparound());
+            System.out.println("PDOut: " + pdOut);
 
-            tankDrive(throttle + pdOut, throttle + pdOut);
+            tankDrive(throttle + pdOut,throttle + pdOut);
             prevError = error;
-        } else {
-            arcadeDrive(0, 0);
-        }
     }
-
-    /**
-     * Hold the current position. Will use gyro and encoder to hold the current
-     * position.
-     * @param hold Whether or not to hold
-     */
-    public void holdPosition(boolean hold) {
-        
-    }
-
+*/
     public void lowGear() {
         shiftA.set(false);
         shiftB.set(true);
+    }
+
+    public void highGear() {
+        shiftA.set(true);
+        shiftB.set(false);
     }
     /**
      * Get Current at a single motor

@@ -65,4 +65,10 @@ public class Attack3Joystick {
     public boolean getButton(int button) {
         return m_Stick.getRawButton(button);    //Return the state of the desired button
     }
+
+    public boolean getAny() {
+        return getButton(1) || getButton(2) || getButton(3) || getButton(4) || getButton(5) ||
+               getButton(6) || getButton(7) || getButton(8) || getButton(9) || getButton(10) ||
+               getButton(11) || getButton(12);
+    }
 }

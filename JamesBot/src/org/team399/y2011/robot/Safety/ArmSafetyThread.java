@@ -7,7 +7,7 @@ package org.team399.y2011.robot.Safety;
 
 /**
  *
- * @author robotics
+ * @author Jeremy Germita
  */
 public class ArmSafetyThread {
 
@@ -15,47 +15,49 @@ public class ArmSafetyThread {
     private double current;
     private double position;
     private double speed;
-    private double temp;
 
-    private final double CURRENT_DANGER_LEVEL = 0.0;
-    private final int CURRENT_DANGER_COUNT = 0;
-    
-    private double prevPosition;
-    private final int POSITION_DANGER_COUNT = 0;
+    //Values for monitoring current:
+    private final double CURRENT_DANGER_LEVEL = 14.0; //Stall current of the motors is 15A, but I use a lower value for good measure
+    private final int CURRENT_DANGER_COUNT = 250;   //Periodic runs at about 50Hz, this is roughly equivalent to 5 seconds
 
-    private final double TEMPERATURE_DANGER_LEVEL = 4.0;
+    //Values for monitoring position:
+    private double prevPosition;                    //Previous position
+    private final int POSITION_DANGER_COUNT = 25;   //About .5 seconds response time if a fault occurs in positioning
 
-    //Note to self: check to see if the rate at which this thread runs is not faster than
-    //the speed of the FRC periodic methods. If that is true, then the counters would run
-    //faster here than in the main thread.
+    public ArmSafetyThread() {
+        System.out.println("[ARM] Safety Thread Initialized.");
+        System.out.println("[ARM] Now monitoring current, speed, and position of arm");
+    }
 
     /**
      * Updates all variables to watch. Must be updated in every loop or a fault will occur.
      * @param t_current
      * @param t_position
      * @param t_speed
-     * @param t_temp
      */
-    public void update(double t_current, double t_position, double t_speed, double t_temp) {
+    public void update(double t_current, double t_position, double t_speed) {
         current = t_current;    //Read values into the variables for monitoring
         position = t_position;
         speed = t_speed;
-        temp = t_temp;
+        fault = watchCurrent() || watchPosition();
     }
 
-    public boolean getFault() {
+    /**
+     * Get the fault state
+     * @return true if there is a fault
+     */
+    public boolean getFaultState() {
         return fault;
     }
 
-    public void run() {
-        fault = watchCurrent() || watchPosition() || watchTemperature();
-    }
-
     private int currCount = 0;
-
+    /**
+     * Monitor the current being drawn by the arm.
+     * @return returns true if arm is over currenting
+     */
     private boolean watchCurrent() {
         boolean currFault;
-        if(current > CURRENT_DANGER_LEVEL) {
+        if(current > CURRENT_DANGER_LEVEL && speed != 0) {
             currCount++;
         } else {
             currCount = 0;
@@ -63,10 +65,26 @@ public class ArmSafetyThread {
 
         currFault = currCount > CURRENT_DANGER_COUNT;
 
+        if(currFault) {
+            System.out.println("[ARM] CURRENT FAULT");
+        }
         return currFault;
     }
 
     private int posCount = 0;
+    /**
+     * Monitor the position of the arm
+     * <i>
+     * if the arm is being given power(greater than 2.4 volts)
+     * <b>AND</b>
+     * if the potentiometer value has remained the same for about .5 seconds,
+     * return true
+     * <b>ALSO</b>
+     * if the position value is greater than 4.95 volts or less than 0.05
+     * return true
+     * </i>
+     * @return return true if the position has remained the same for too long.
+     */
     private boolean watchPosition() {
         boolean posFault;
         if(Math.abs(speed) > .2 && prevPosition == position) {
@@ -79,10 +97,10 @@ public class ArmSafetyThread {
                    (position > 4.95) ||
                    (position < 0.05);
         prevPosition = position;
+        if(posFault) {
+            System.out.println("[ARM] POSITION FAULT");
+        }
         return posFault;
     }
 
-    private boolean watchTemperature() {
-        return temp > TEMPERATURE_DANGER_LEVEL;
-    }
 }

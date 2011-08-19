@@ -7,6 +7,7 @@
 
 package org.team399.y2011.robot;
 
+import com.sun.squawk.util.MathUtils;
 import org.team399.y2011.robot.actuators.DriveTrain;
 import org.team399.y2011.robot.actuators.Arm;
 import org.team399.y2011.robot.actuators.RollerClaw;
@@ -51,7 +52,7 @@ public class JamesBot extends IterativeRobot {
     private Operator operator = new Operator("Gabe");      //Operator instance
 
     //Other variables:
-    public static int autonomousMode = 0;
+    public static int autonomousMode = 1;
 
 
     /**
@@ -67,34 +68,47 @@ public class JamesBot extends IterativeRobot {
      */
     public void disabledInit() {
         arm.disable();  //Disable arm PID control
+        robot.resetGyro();
     }
-
+    boolean autonOff = true;   //Disable autonomous switch
     /**
      * Run this during disabled mode
      */
     public void disabledPeriodic() {
-        boolean autonOff = io.getRightToggleSwitch();   //Disable autonomous switch
+        
                                                         //JIC we are paired with a 2-tube scorer
         if(autonOff) {                                  //If autonomous is disabled
             autonomousMode = 0;                         //Do nothing
         } else {                                        //Else
-            if(io.getWhiteButton()) {                   //Select autonomous with the arcade buttons
-                autonomousMode = 1;
-            } else if(io.getBlackButton()) {
-                autonomousMode = 2;
-            } else if(io.getRedButton()) {
-                autonomousMode = 3;
-            } else if(io.getBlueButton()) {
-                autonomousMode = 4;
-            }
+            autonomousMode = 1;
         }
 
-        if(leftJoy.getTrigger() && rightJoy.getTrigger()) { //Manual override JIC the IO board malfunctions
+        if(roller.getLimitSwitch()) {
+            System.out.println("Tube In!!");
             autonOff = false;
+        } else {
+            System.out.println("No Tube!!");
+            autonOff = true;
         }
-        db.packAll(autonOff, autonomousMode, 0);    //Pack data into dashboard
-        db.commit();                                //Commit data to dashboard
+        //System.out.println(autonOff);
+
+        io.setIndicators(autonOff);
+
+
+        /*if(leftJoy.getTrigger() || rightJoy.getTrigger()) { //Manual override JIC the IO board malfunctions
+            autonOff = false;
+        } else if(!(io.getBlackButton() || io.getRedButton())){
+            autonOff = true;
+        } else {
+            autonOff = false;
+        }*/
+        //db.disabledPackAll();    //Pack data into dashboard
+
         arm.print();
+
+        //robot.print();
+        //System.out.println("JoyAngle: " + Math.toDegrees(MathUtils.atan2((Math.abs(rightJoy.getX()) > .1 ? rightJoy.getX() : 0),
+        //                                                   (Math.abs(rightJoy.getY()) > .1 ? rightJoy.getY() : 0))));
     }
 
     /**
@@ -112,6 +126,7 @@ public class JamesBot extends IterativeRobot {
     public void teleopPeriodic() {
         driver.drive();     //Driver stuff
         operator.operate(); //Operater stuff
+        //db.teleopPackAll();
     }
 
     public void autonomousInit() {
@@ -120,6 +135,7 @@ public class JamesBot extends IterativeRobot {
         robot.resetGyro();              //Reset Gyro
         compressor.start();             //Start compressor
         switch(autonomousMode) {
+            case 0: AutonomousRoutines.disabled(); break;
             case 1: //Auton 1 requires some initialization, do it.
                 AutonomousRoutines.initCompetentAuton(); break;
             case 2: //Auton 2 requires no initialization. at the moment.
@@ -133,7 +149,9 @@ public class JamesBot extends IterativeRobot {
        }
     }
     public void autonomousPeriodic() {
+         
         switch(autonomousMode) {
+            case 0: AutonomousRoutines.disabled(); break;
             case 1: //If you pressed the white button before the match, do the dead reckonining timer autonomous(DRTA)
                 //This autonomous uses no sensors and brought us to the finals in SD
                 //AutonomousRoutines.dumbAuton(); break;
@@ -146,7 +164,7 @@ public class JamesBot extends IterativeRobot {
                 break;
             default:
                 AutonomousRoutines.competentAuton(); break;
-                
+
        }
     }
 }
