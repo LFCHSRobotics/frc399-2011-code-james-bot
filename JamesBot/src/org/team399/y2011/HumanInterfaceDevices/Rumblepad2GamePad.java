@@ -2,7 +2,6 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-
 package org.team399.y2011.HumanInterfaceDevices;
 
 import edu.wpi.first.wpilibj.Joystick;
@@ -12,7 +11,9 @@ import edu.wpi.first.wpilibj.Joystick;
  * @author Jeremy Germita
  */
 public class Rumblepad2GamePad {
+
     private Joystick m_Pad;   //Joystick object
+
     /**
      * Contructor.
      * @param port The USB port the gamepad is connected to
@@ -36,6 +37,7 @@ public class Rumblepad2GamePad {
     public double getLeftX() {
         return m_Pad.getRawAxis(1); //Return the left X axis value
     }
+
     /**
      * Get the left Y axis
      * @return the Y axis
@@ -60,9 +62,14 @@ public class Rumblepad2GamePad {
     public boolean getButton(int button) {
         return m_Pad.getRawButton(button);  //Return the state of the desired button
     }
-    
+
+    /**
+     * Get the state of the specified D pad direction
+     * @param direction
+     * @return
+     */
     public boolean getDPad(int direction) {
-        switch(direction) {
+        switch (direction) {
             case DPadStates.UP:
                 return (m_Pad.getRawAxis(6) < -.7);
             case DPadStates.DOWN:
@@ -73,20 +80,28 @@ public class Rumblepad2GamePad {
                 return (m_Pad.getRawAxis(5) < -.7);
             default:
                 return false;
-             
+
         }
     }
 
+    /**
+     * Directional pad states.
+     */
     public static interface DPadStates {
+
         final int UP = 0;
         final int DOWN = 1;
         final int LEFT = 2;
         final int RIGHT = 3;
     }
 
+    /**
+     * Get the states of all of the buttons on the gamepad
+     * @return
+     */
     public boolean getAny() {
-        return getButton(1) || getButton(2) || getButton(3) || getButton(4) || getButton(5) ||
-               getButton(6) || getButton(7) || getButton(8) || getButton(9) || getButton(10) ||
-               getButton(11) || getButton(12);
+        return getButton(1) || getButton(2) || getButton(3) || getButton(4) || getButton(5)
+                || getButton(6) || getButton(7) || getButton(8) || getButton(9) || getButton(10)
+                || getButton(11) || getButton(12);
     }
 }

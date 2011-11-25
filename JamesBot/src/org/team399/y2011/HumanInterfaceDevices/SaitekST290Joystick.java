@@ -11,7 +11,7 @@ import java.lang.Math;
  * A wrapper Class for use with the Logitech Attack 3 Joystick
  * @author Jeremy Germita
  */
-public class Attack3Joystick {
+public class SaitekST290Joystick {
 
     private Joystick m_Stick;   //Joystick object
 
@@ -19,7 +19,7 @@ public class Attack3Joystick {
      * Contructor.
      * @param port The USB port the Joystick is connected to
      */
-    public Attack3Joystick(int port) {
+    public SaitekST290Joystick(int port) {
         m_Stick = new Joystick(port);   //Instantiate joystick on desired port
     }
 
@@ -49,7 +49,11 @@ public class Attack3Joystick {
      * @return the throttle
      */
     public double getThrottle() {
-        return m_Stick.getRawAxis(3);  //Return the throttle value
+        return m_Stick.getRawAxis(4);  //Return the throttle value
+    }
+
+    public double getTwist() {
+        return m_Stick.getRawAxis(3);
     }
 
     /**
@@ -70,12 +74,20 @@ public class Attack3Joystick {
     }
 
     /**
-     * Gets the state of all of the buttons
+     * Get the state of any button on the stick
      * @return
      */
     public boolean getAny() {
         return getButton(1) || getButton(2) || getButton(3) || getButton(4) || getButton(5)
-                || getButton(6) || getButton(7) || getButton(8) || getButton(9) || getButton(10)
-                || getButton(11) || getButton(12);
+                || getButton(6);
+    }
+
+    /**
+     * Get the direction of the POV Hat on the stick
+     * @return
+     */
+    public int getPovDirection() {
+
+        return 0;
     }
 }

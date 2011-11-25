@@ -2,8 +2,8 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-
 package org.team399.y2011.communications;
+
 import edu.wpi.first.wpilibj.Dashboard;
 import edu.wpi.first.wpilibj.DriverStationLCD;
 import edu.wpi.first.wpilibj.DriverStation;
@@ -16,6 +16,7 @@ import org.team399.y2011.robot.actuators.Arm;
  */
 public class FRCDashboard {
     //private FRCDashboard m_dashHigh; //Commented out because it is never used. One less object to initialize
+
     private Dashboard m_dashLow;
     private DriverStationLCD m_lcd;
     private DriverStation m_ds;
@@ -26,15 +27,17 @@ public class FRCDashboard {
      */
     public FRCDashboard() {
         //m_dashHigh = DriverStation.getInstance().getDashboardPackerHigh();
-        m_dashLow  = DriverStation.getInstance().getDashboardPackerLow();
+        m_dashLow = DriverStation.getInstance().getDashboardPackerLow();
         m_lcd = DriverStationLCD.getInstance();
         m_ds = DriverStation.getInstance();
     }
 
     public void writeLCD(int line, String text) {
         //TODO: EDIT THIS METHOD
-        switch(line) {
-            case 1: m_lcd.println(DriverStationLCD.Line.kMain6, line, text); break;
+        switch (line) {
+            case 1:
+                m_lcd.println(DriverStationLCD.Line.kMain6, line, text);
+                break;
         }
     }
 
@@ -61,26 +64,24 @@ public class FRCDashboard {
     public void commit() {
         m_dashLow.commit();
     }
-    
+
     public String getStation() {
-        String outDataAlliance = m_ds.getAlliance() == DriverStation.Alliance.kBlue ?
-                          "Blue " : "Red ";
+        String outDataAlliance = m_ds.getAlliance() == DriverStation.Alliance.kBlue
+                ? "Blue " : "Red ";
         return outDataAlliance + m_ds.getLocation();
     }
-
     private boolean left = false, right = false, gamepad = false;
 
-
     public void disabledPackAll() {
-        if(JamesBot.leftJoy.getAny()) {
+        if (JamesBot.leftJoy.getAny()) {
             left = true;
         }
 
-        if(JamesBot.rightJoy.getAny()) {
+        if (JamesBot.rightJoy.getAny()) {
             right = true;
         }
 
-        if(JamesBot.gamePad.getAny()) {
+        if (JamesBot.gamePad.getAny()) {
             gamepad = true;
         }
         sendBoolean(left);
@@ -120,5 +121,4 @@ public class FRCDashboard {
         sendString(m_diag_print);
         commit();
     }
-
 }

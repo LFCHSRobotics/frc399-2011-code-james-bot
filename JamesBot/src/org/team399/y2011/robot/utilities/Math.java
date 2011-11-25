@@ -20,4 +20,8 @@ public class Math {
     public static boolean threshold(double input, double high, double low) {
         return ((input < high) || (input < low));
     }
+
+    public static double abs(double data) {
+        return (data < 0 ? -data : data);
+    }
 }
