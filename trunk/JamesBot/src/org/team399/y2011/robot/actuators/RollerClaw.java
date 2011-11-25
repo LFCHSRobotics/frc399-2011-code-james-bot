@@ -2,7 +2,6 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-
 package org.team399.y2011.robot.actuators;
 
 import edu.wpi.first.wpilibj.CANJaguar;
@@ -16,7 +15,7 @@ import org.team399.y2011.robot.utilities.ExceptionHandler;
 public class RollerClaw {
 
     private CANJaguar rollerA, rollerB; //The roller CANJaguars
-    private DigitalInput limit;
+    private DigitalInput limit;         //Roller claw limit switch
 
     /**
      * Constructor
@@ -25,14 +24,14 @@ public class RollerClaw {
         try {
             rollerA = new CANJaguar(3); //Create CANJaguar objects on addresses
             rollerB = new CANJaguar(9); //3 and 9
-            rollerA.configNeutralMode(CANJaguar.NeutralMode.kCoast);
+            rollerA.configNeutralMode(CANJaguar.NeutralMode.kCoast);    //Set them in coast mode
             rollerB.configNeutralMode(CANJaguar.NeutralMode.kCoast);
-        } catch(Exception e) {
+        } catch (Exception e) {
             e.printStackTrace();
             System.out.println("ERROR INITIALIZING ROLLER CLAW");
         }
 
-        limit = new DigitalInput(1);
+        limit = new DigitalInput(1);    //Roller claw switch on DI1
 
     }
 
@@ -42,9 +41,9 @@ public class RollerClaw {
      */
     public void grab(double speed) {
         try {
-            rollerA.setX(speed);
+            rollerA.setX(speed * .75);    //Motors are different... scale one
             rollerB.setX(speed);
-        } catch(Exception e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
@@ -55,9 +54,9 @@ public class RollerClaw {
      */
     public void articulate(double speed) {
         try {
-            rollerA.setX(-speed);
+            rollerA.setX(-speed * .75);   //Motors are different... scale one
             rollerB.setX(speed);
-        } catch(Exception e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
@@ -67,14 +66,14 @@ public class RollerClaw {
      * @return Limit switch state
      */
     public boolean getLimitSwitch() {
-        return !limit.get();
+        return !limit.get();    //Invert switch.
     }
 
     /**
      * Automatic hold tube method
      */
     public void holdTube() {
-        if(!getLimitSwitch()) {
+        if (!getLimitSwitch()) { //If the switch is not pressed, roll the claw
             grab(1);
         } else {
             grab(0);
@@ -85,13 +84,12 @@ public class RollerClaw {
      * Automatic spit tube method
      */
     public void spitTube() {
-        if(getLimitSwitch()) {
-            grab(-1);
+        if (getLimitSwitch()) {
+            grab(-1);       //Apply more power if the switch is pressed
         } else {
             grab(-.5);
         }
     }
-
 
     /**
      * Run a motor at the set speed
@@ -99,18 +97,18 @@ public class RollerClaw {
      * @param speed the speed to run said motor
      */
     public void setRaw(int motor, double speed) {
-        switch(motor) {
+        switch (motor) {
             case 0:
                 try {
                     rollerA.setX(speed);
-                } catch(Exception e) {
+                } catch (Exception e) {
                     e.printStackTrace();
                 }
                 break;
             case 1:
                 try {
                     rollerB.setX(speed);
-                } catch(Exception e) {
+                } catch (Exception e) {
                     e.printStackTrace();
                 }
                 break;
@@ -142,14 +140,4 @@ public class RollerClaw {
             return -0;
         }
     }
-
-    public static class CURRENT_LEVELS {
-        public static class UPPER_MOTOR {
-
-        }
-        public static class LOWER_MOTOR {
-            
-        }
-    }
-
 }

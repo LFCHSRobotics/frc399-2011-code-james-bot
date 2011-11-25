@@ -2,8 +2,8 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-
 package org.team399.y2011.HumanInterfaceDevices;
+
 import edu.wpi.first.wpilibj.DriverStationEnhancedIO;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStationEnhancedIO.EnhancedIOException;
@@ -16,31 +16,22 @@ public class DriverStationUserInterface {
 
     private DriverStationEnhancedIO m_io;   //IO board object
     private boolean fault = false;
-
     //Digital channels for the different switches
-    final short BLUE_BUTTON        = 11;
-    final short RED_BUTTON         = 1;
-    final short WHITE_BUTTON       = 9;
-    final short BLACK_BUTTON       = 3;
+    final short BLUE_BUTTON = 11;
+    final short RED_BUTTON = 1;
+    final short WHITE_BUTTON = 9;
+    final short BLACK_BUTTON = 3;
     final short TOGGLE_SWITCH_LEFT = 12;
-    final short TOGGLE_SWITCH_RIGHT= 6;
-    final short MISSILE_SWITCH     = 2;
-
+    final short TOGGLE_SWITCH_RIGHT = 6;
+    final short MISSILE_SWITCH = 2;
 
     /**
      * Constructor.
      */
     public DriverStationUserInterface() {
+
         m_io = DriverStation.getInstance().getEnhancedIO(); //Instantiating the object
-        //try {
-            //m_io.getAnalogIn(1);
-        //} catch(EnhancedIOException e) {
-            //fault = true;
-        //    e.printStackTrace();
-        //}
     }
-
-
 
     /**
      * Get the state of the blue button
@@ -105,16 +96,16 @@ public class DriverStationUserInterface {
      */
     public boolean getDigital(int which) {
         //if(!fault) {
-            try {
-                return m_io.getDigital(which);
-            } catch(Exception e) {
-                e.printStackTrace();
-                //fault = true;
-                return false;
-            }
-        //} else {
-        //    return false;
-        //}
+        try {
+            return m_io.getDigital(which);
+        } catch (Exception e) {
+            e.printStackTrace();
+            fault = true;
+            return false;
+        }
+//        } else {
+//            return false;
+//        }
     }
 
     /**
@@ -124,16 +115,16 @@ public class DriverStationUserInterface {
      */
     public double getAnalog(int which) {
         //if(!fault) {
-            try {
-                return m_io.getAnalogIn(which);
-            } catch(Exception e) {
-                e.printStackTrace();
-                //fault = true;
-                return 0.0;
-            }
-        //} else {
-        //    return 0.0;
-        //}
+        try {
+            return m_io.getAnalogIn(which);
+        } catch (Exception e) {
+            e.printStackTrace();
+            fault = true;
+            return 0.0;
+        }
+//        } else {
+//            return 0.0;
+//        }
     }
 
     /**
@@ -141,10 +132,12 @@ public class DriverStationUserInterface {
      * @return false during normal activity, true if the board is not plugged in
      */
     public boolean getFault() {
-        fault = false;
         try {
-            m_io.getAnalogIn(1);
-        } catch(EnhancedIOException eioe) {
+            fault = false;
+            if (m_io.getFirmwareVersion() == 0) {
+                fault = true;
+            }
+        } catch (EnhancedIOException eioe) {
             eioe.printStackTrace();
             fault = true;
         }
@@ -152,13 +145,20 @@ public class DriverStationUserInterface {
     }
 
     public void setIndicators(boolean state) {
-        
+        if (!fault) {
             try {
                 m_io.setLED(1, state);
+                m_io.setLED(2, state);
+                m_io.setLED(3, state);
+                m_io.setLED(4, state);
                 m_io.setLED(5, state);
-            } catch(Exception e) {
+                m_io.setLED(6, state);
+                m_io.setLED(7, state);
+                m_io.setLED(8, state);
+
+            } catch (Exception e) {
                 e.printStackTrace();
             }
-        
+        }
     }
 }

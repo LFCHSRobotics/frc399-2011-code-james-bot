@@ -2,7 +2,6 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-
 package org.team399.y2011.robot.actuators;
 
 import edu.wpi.first.wpilibj.DoubleSolenoid;
@@ -15,7 +14,7 @@ public class DeploymentMechanism {
 
     private DoubleSolenoid deployActuator;  //The actuator
     private long startTime = 0;             //StartTime for auto deploy timer
-    private long deployTime = 110000;       //Time to deploy minibot
+    private long deployTime = 110000;       //Time to deploy minibot automatically
 
     /**
      * Constructor
@@ -31,8 +30,8 @@ public class DeploymentMechanism {
      * @param state the boolean input used to deploy
      */
     public void deploy(boolean state) {
-        deployActuator.set(((state) ? DoubleSolenoid.Value.kForward :
-            DoubleSolenoid.Value.kReverse));    //sets the solenoid
+        deployActuator.set(((state) ? DoubleSolenoid.Value.kForward
+                : DoubleSolenoid.Value.kReverse));    //sets the solenoid
     }
 
     /**
@@ -46,7 +45,7 @@ public class DeploymentMechanism {
      * Deploy the minibot with a timer
      */
     public void timerDeploy() {
-        if(getTimeSinceStart() > deployTime) {
+        if (getTimeSinceStart() > deployTime) {
             deploy(true);
         } else {
             deploy(false);
